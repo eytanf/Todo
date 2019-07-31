@@ -1,0 +1,6 @@
+/* You can add global styles to this file, and also import other style files */
+.page{
+    background-image: url('./assets/kelly-sikkema--1_RZL8BGBM-unsplash.jpg');
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

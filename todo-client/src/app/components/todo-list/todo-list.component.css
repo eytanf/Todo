@@ -1,0 +1,108 @@
+.title{
+    color: darkblue;
+}
+
+.toolbar-spacer {
+    flex: 1 1 auto;
+}
+
+.a-bit-right{
+    flex: 0.01 0.01 auto;
+}
+
+.input{
+    width: 48%;
+    border: 2px solid darkblue;
+    background-image: url('../../../assets/clipboards.png');
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+
+.button{
+    color:white;
+    background-color: darkblue;
+    border: none;
+    text-align: center;
+    padding: 3px 15px;
+}
+
+table{
+    width: 50%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.checkBox{
+    width: 10%;
+}
+
+table, th, tr , td{
+    border: 3px solid black;
+    color: darkblue;
+
+}
+
+.print{
+    color: darkblue;
+    background-color: white;
+    width: 50%;
+}
+
+.checkBoxBtn{
+    color: white;
+    background-image: url('../../../assets/checked.png');
+    background-repeat: no-repeat;
+    border: none;
+    padding : 0px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.removeBoxBtn{
+    color: white;
+    background-image: url('../../../assets/cancel.png');
+    background-repeat: no-repeat;
+    border: none;
+    padding : 0px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.rotateBtn{
+    color: white;
+    background-image: url('../../../assets/rotate.png');
+    background-repeat: no-repeat;
+    border: none;
+    padding : 0px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.disabled{
+    background-color: lightgray;
+    color: gray;
+    text-decoration: line-through;
+}
+
+.updateInput{
+    width: 99%;
+}
+
+.updateBtn{
+    color: white;
+    background-image: url('../../../assets/clipboards.png');
+    background-repeat: no-repeat;
+    border: none;
+    padding : 0px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+header{
+    display: block;
+}
+
+.signoutBtn{
+    color: white;
+ }
+
