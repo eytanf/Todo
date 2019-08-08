@@ -1,9 +1,22 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Output, ViewChild } from '@angular/core';
 import { UserService } from '../../user.service';
 import { Router } from '@angular/router';
 import { TodoListComponent } from '../todo-list/todo-list.component';
+import { FormControl, FormGroupDirective, NgForm, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
+import {ErrorStateMatcher} from '@angular/material/core';
 
+
+export class MyErrorStateMatcher implements ErrorStateMatcher  {
+  // realControl;
+  // constructor(realControl: FormControl){
+  //   this.realControl = realControl;
+  // }
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
 
 @Component({
   selector: 'app-header',
@@ -11,7 +24,9 @@ import { CookieService } from 'ngx-cookie-service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  
+  @ViewChild(FormGroupDirective)
+  formGroupDirective: FormGroupDirective;
+  signupForm: FormGroup;
   logInput: string = "";
   regInput: string = "";
   regPassword: string ="";
@@ -20,8 +35,18 @@ export class HeaderComponent implements OnInit {
   isClicked: boolean = false;
   isUserValid: boolean = false;
   isUserExist: boolean = false;
+  matcher = new MyErrorStateMatcher();
 
-  constructor(private userService: UserService , private router:Router , private todo: TodoListComponent , private cookieService: CookieService) {}
+  constructor(private userService: UserService 
+    , private router:Router 
+    , private todo: TodoListComponent 
+    , private cookieService: CookieService,
+    fb: FormBuilder) {
+      this.signupForm = fb.group({
+        username: [null, Validators.required],
+        fruit: [null, Validators.required]
+      })
+    }
    
   
   @Output() userName: string = '';
@@ -50,6 +75,8 @@ export class HeaderComponent implements OnInit {
   isClickedFunc(){
     this.isClicked = false;
   }
+
+
 
   //Check if the user is valid and if button is clicked
   isUserValidFunc(password){
@@ -112,7 +139,7 @@ export class HeaderComponent implements OnInit {
   validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase()) || email.length == 0;
-}
+  } 
 
 //Clean all text input when closing login or register form
 clean(){
@@ -123,5 +150,15 @@ clean(){
   this.logPassword = "";
   this.isClicked = false;
   this.isUserValid = false;
+  this.isUserExist = false;
+  console.log(this.signupForm.value)
+  this.signupForm.reset();
+  // This doesn't work alone, as we know
+  this.signupForm.reset();
+
+  // This is needed to clear the 'submitted' state
+  this.formGroupDirective.resetForm();
 }
+
+
 }

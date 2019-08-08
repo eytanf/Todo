@@ -6,11 +6,18 @@ header{
   flex: 1 1 auto;
 }
 
-.signinBtn, .signupBtn{
-    color:white;
- }
- 
+.button-group{
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+  min-width: 300px;
+}
 
+.mat-table {
+  overflow: auto;
+  max-height: 500px;
+}
+ 
  /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
@@ -22,13 +29,22 @@ header{
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     padding-top: 59px;
+    background-color: rgba(0,0,0,0.7);
+    
   }
   
   /* Modal Content/Box */
   .modal-content {
-    background-color: whitesmoke;
+    display: flex;
+    background-color: gainsboro;
     margin: 5px auto; /* 15% from the top and centered */
-    width: 20%; /* size of content */
+    width: 220px; /* size of content */
+  }
+  .modal-content-Signin{
+    display: flex;
+    background-color: gainsboro;
+    margin: 5px auto; /* 15% from the top and centered */
+    width: 220px; /* size of content */
   }
   
   /* Add Zoom Animation */
@@ -46,11 +62,15 @@ header{
   /* Bordered form */
 form {
     color: darkblue;
+    overflow: auto; /* Enable scroll if needed */
+    
+    
   }
 
   /* Add padding to containers */
   .container {
-    padding: 16px;
+    padding: 5%;
+    margin: 1 auto;
   }
 
   h1{
@@ -66,6 +86,81 @@ form {
     color: red;
     font-size: 10px;
   }
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  @media screen and (max-width: 992px) {
+    .modal-content {
+      width: 160px; /* Full width */
+      height: 260px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    .modal-content-Signin {
+      width: 160px; /* Full width */
+      height: 150px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    mat-form-field{
+      width: 75%;
+      height: 20%;
+    }
+    .container{
+      padding: 7px;
+    }
+    .modalBtnIn , .modalBtnOut{
+      font-size:10px ;
+    }
+    .modalBtnOut{
+      position: absolute;
+
+    }
+    .error{
+      font-size: 8px;
+    }
+  .mat-input-placeholder{
+      font-size: 50px;
+    }
+  }
+  
+/* On screens that are 600px or less, set the background color to olive */
+@media screen and (max-width: 600px) {
+  .modal-content {
+    width: 130px; /* Full width */
+    height: 200px;
+    overflow: hidden;
+    font-size: 10px;
+  }
+  .modal-content-Signin {
+    width: 130px; /* Full width */
+    height: 120px;
+    overflow: hidden;
+    font-size: 10px;
+  }
+  mat-form-field{
+    width: 90%;
+    height: 20%;
+    padding-left: 5px;
+  }
+  .container{
+    padding: 0px;
+    width: 130px;
+  }
+  .modalBtnIn .modalBtnOut{
+    font-size:6px ;
+    padding: 0 14px;
+  }
+  .modalBtnOut{
+    position: absolute;
+  }
+  .error{
+    font-size: 6px;
+  }
+}
+
 
   
 

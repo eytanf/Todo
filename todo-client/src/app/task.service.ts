@@ -35,10 +35,11 @@ export class TaskService {
   }
 
   //Add a new task to our database and returns it
-  addTask(task , complete ){
+  addTask(task , complete , youtubeUrl){
     const taskToAdd = {
       task: task,
-      complete: complete
+      complete: complete,
+      url: youtubeUrl
     }
     return this.http.post(`${this.uri}/tasks/add`,taskToAdd , {
       headers: {

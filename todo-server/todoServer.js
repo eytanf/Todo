@@ -99,7 +99,8 @@ router.route('/tasks/add').post(verify,(req , res) => {
         const temp = {
             task: req.body.task,
             complete: req.body.complete,
-            taskOwnerId: result[0].userId
+            taskOwnerId: result[0].userId,
+            url: req.body.url
         }
         let task = new Task(temp);
         task.save().then(task => {
@@ -109,7 +110,7 @@ router.route('/tasks/add').post(verify,(req , res) => {
         });
     })
     .catch(err => {
-        res.status(400).json(({msg: err}));
+        res.status(401).json(({msg: err}));
     });
 });
 

@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule   } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { JwtModule } from '@auth0/angular-jwt';
@@ -8,6 +8,9 @@ import { CommonModule } from '@angular/common';
 import { AuthGuardService as AuthGuard } from './auth/auth-guard.service';
 import { CookieService } from 'ngx-cookie-service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatButtonModule , 
   MatToolbarModule,
   MatInputModule, 
@@ -15,7 +18,12 @@ import { MatButtonModule ,
   MatPaginatorModule,
   MatSortModule ,
   MatDialogModule,
-  MatCheckboxModule } from '@angular/material';
+  MatCheckboxModule,
+  MatIconModule,
+  MatFormFieldModule,
+  MatTooltipModule,
+  MatSidenavModule,
+ } from '@angular/material';
 
 
 import { AppComponent } from './app.component';
@@ -37,12 +45,20 @@ export function tokenGetter() {
     routingComponents[1]
   ],
   imports: [
+    NgbModule,
+    FlexLayoutModule,
+    ReactiveFormsModule ,
+    NgxYoutubePlayerModule,
+    MatSidenavModule,
     MatCheckboxModule,
+    MatTooltipModule,
     MatInputModule, 
     MatTableModule, 
     MatPaginatorModule,
+    MatIconModule,
     MatSortModule ,
     MatDialogModule,
+    MatFormFieldModule,
     MatButtonModule,
     MatToolbarModule,
     CommonModule,
@@ -52,6 +68,7 @@ export function tokenGetter() {
     BrowserAnimationsModule,
     HttpClientModule,
     MatProgressSpinnerModule,
+    MatIconModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
@@ -64,3 +81,4 @@ export function tokenGetter() {
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

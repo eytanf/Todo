@@ -1,105 +1,134 @@
 .title{
-    color: darkblue;
+    color: hsl(240, 100%, 27%);
+    padding-left: 40%;
+    font-size: 200%;
 }
+
+
+
 
 .toolbar-spacer {
     flex: 1 1 auto;
 }
 
 .a-bit-right{
-    flex: 0.01 0.01 auto;
+    flex: 1 1 auto;
 }
 
 .tasks-input{
     width: 50%;
+    padding-left: 25%;
 }
 
+.button-group {
+  position: absolute;
+  left: 25%;
+  margin: 1;
+  width: 45%;
+}
 .button{
     color:white;
-    background-color: darkblue;
+    background-color: darkblue; 
+     
 }
 
-/* table{
-    width: 50%;
-    border-collapse: collapse;
-    background-color: white;
-} */
 
-/* .checkBox{
-    width: 10%;
-} */
-
-/* table, th, tr , td{
-    border: 3px solid black;
-    color: darkblue;
-
-} */
-
-.print{
-    color: darkblue;
-    background-color: white;
-    width: 50%;
-}
-
-.checkBoxBtn{
-    color: white;
-    background-image: url('../../../assets/checked.png');
-    background-repeat: no-repeat;
-    border: none;
-    padding : 0px 10px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.removeBoxBtn{
-    color: white;
-    background-image: url('../../../assets/cancel.png');
-    background-repeat: no-repeat;
-    border: none;
-    padding : 0px 10px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.rotateBtn{
-    color: white;
-    background-image: url('../../../assets/rotate.png');
-    background-repeat: no-repeat;
-    border: none;
-    padding : 0px 10px;
-    border-radius: 50%;
-    cursor: pointer;
-}
 
 .disabled{
-    background-color: lightgray;
     color: gray;
     text-decoration: line-through;
+    width: 100%;
 }
 
-.updateInput{
-    width: 99%;
-}
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    padding-top: 59px;
+    background-color: rgba(0,0,0,0.7);
+  }
+  
+  
+  /* Modal Content/Box */
+  .modal-content {
+    padding-right: 35%;
+    padding-top: 2%;
+    margin: 5px auto; /* 15% from the top and centered */
+    width: 20%; /* size of content */
+  }
+  
+  /* Add Zoom Animation */
+  .animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+  }
+   
+  /*configuration for the animation pop up*/
+  @keyframes animatezoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+  }
 
-.updateBtn{
-    color: white;
-    background-image: url('../../../assets/clipboards.png');
-    background-repeat: no-repeat;
-    border: none;
-    padding : 0px 10px;
-    border-radius: 50%;
-    cursor: pointer;
-}
+  form {
+    color: darkblue;
+    
+  }
 
-header{
-    display: block;
-}
+  /* Add padding to containers */
+  .container {
+    padding: 16px;
+  }
 
-.signoutBtn{
-    color: white;
- }
+  h1{
+    color: darkblue;
+    font-style: italic;
+  }
 
- table {
-    width: 40%;
+  p{
+    color:darkblue;
+  }
+
+  .error{
+    color: red;
+    font-size: 10px;
+    padding-left: 25%;
+  }
+
+  
+
+  @media screen and (max-width: 992px) {
+  }
+
+  @media screen and (max-width: 600px) {
+    .button-group {
+      position: absolute;
+      left: 0%;
+      margin: 1;
+      width: 45%;
+    }
+
+    .title{
+      padding-left: 0%;
+    }
+
+    :host ::ng-deep .mat-form-field-wrapper{
+      max-width: 150px;
+    
+    }
+
+    :host ::ng-deep youtube-player iframe{
+      width: 300px;
+      height: 150px;
+    }
+
+    .modal-content{
+      padding-right: 60%;
+    }
+  
   }
 

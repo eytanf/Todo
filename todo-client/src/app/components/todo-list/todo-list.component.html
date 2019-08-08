@@ -10,60 +10,248 @@
         </button>
     </mat-toolbar>
 </div>
-<h1 class="title">Please insert a Task:</h1>
+
+<h1 class="title">Insert a task to begin!</h1>
 <!--Input to insert new tasks to do-->
 <mat-form-field class="tasks-input" color="primary">
-<input 
-matInput color="primary"
-#task 
-[(ngModel)]="value" 
-type="text" 
-id="myInput" 
-(keyup.enter)="add(task.value)" 
-placeholder="Insert task.." >
+    <input 
+    matInput color="primary"
+    #task 
+    [(ngModel)]="value" 
+    type="text" 
+    id="myInput" 
+    (focusin)="resetEmptyTask()"
+    (keyup.enter)="add(task.value , url.value)" 
+    placeholder="Insert a task..." >
 </mat-form-field>
+<br>
+<!--Input to insert an Url with the task-->
+<mat-form-field class="tasks-input" color="primary">
+    <input
+    matInput color="primary"
+    #url
+    (keyup.enter)="add(task.value , url.value)"
+    [(ngModel)]="urlInput"
+    type="url"
+    placeholder="URL...">
+</mat-form-field>
+<br>
+
 <!--Button to submit the client task to our data base (enter also works)-->
-<button mat-raised-button class="button" id="myButton" (click)="add(task.value)">Add</button>
-<br><br>
+
+<label class="error" *ngIf="!isValidUrl(urlInput)">Url is not valid</label>
+<br>
+<label class="error" *ngIf="emptyTask">Empty task can't be submitted</label>
+<br>
+<div class="button-group">
+<button 
+mat-raised-button matTooltip="click to insert a new task" 
+class="button" 
+id="myButton" 
+(click)="add(task.value , url.value)">
+    Submit
+</button>
+</div>
+<br>
+<br>
+<div class="button-group">
+    <!--Move all ,button disabled if nothing is selected-->
+    <button mat-button color="primary" matTooltip="click to move selected tasks to done" [disabled]="!todoSelection.hasValue()" (click)="moveToDoneSelectedTodo()">Done</button>
+    <!--Delete all ,button disabled if nothing is selected-->
+    <button mat-button color="primary" matTooltip="click to delete selected tasks" [disabled]="!todoSelection.hasValue()" (click)="deleteSelectedTodo()">Delete</button>
+</div>
+<br>
+<br>
+<div class="button-group">
 <!--Visual table with the tasks from todo-->
+<table mat-table [dataSource]="todoDataSource" class="mat-elevation-z8">
 
-<table mat-table  [dataSource]="todos" class="mat-elevation-z8">
+  <!-- Checkbox Column -->
+  <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggleTodo() : null"
+                    [checked]="todoSelection.hasValue() && isAllSelectedTodo()"
+                    [indeterminate]="todoSelection.hasValue() && !isAllSelectedTodo()"
+                    [aria-label]="checkboxLabelTodo()">
+      </mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let row">
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? todoSelection.toggle(row) : null"
+                    [checked]="todoSelection.isSelected(row)"
+                    [aria-label]="checkboxLabelTodo(row)">
+      </mat-checkbox>
+    </td>
+  </ng-container>
 
-    <!--- Note that these columns can be defined in any order.
-            The actual rendered columns are set as a property on the row definition" -->
 
+  <!-- Tasks Column -->
+  <ng-container matColumnDef="task">
+    <th mat-header-cell *matHeaderCellDef> Tasks </th>
+    <td mat-cell *matCellDef="let element" class="edit-input"> 
+        <mat-form-field >
+            <input 
+            matInput 
+            [(ngModel)]="element.task" 
+            (focusout)="updateField(element)" 
+            id="myUpdateInput" 
+            (keyup.enter)="updateField(element)" 
+            placeholder="Click to edit" >
+        </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!--Done Button-->
+  <ng-container matColumnDef="done">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element"> 
+        <button mat-icon-button matTooltip="click to move task to done list" color="primary" (click)="moveToDone(element)">
+            <mat-icon>check_circle_outline</mat-icon>
+        </button>
+    </td>
+  </ng-container>
+
+  <!--Remove Button-->
+  <ng-container matColumnDef="delete">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element"> 
+        <button mat-icon-button matTooltip="click to delete task" color="warn" (click)="removeFromTodo(element)">
+            <mat-icon>highlight_off</mat-icon>
+        </button>
+    </td>
+  </ng-container>
+
+  <!--Edit Button-->
+  <ng-container matColumnDef="update">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element"> 
+        <button mat-icon-button matTooltip="click to save edited task" color="accent" (click)="updateField(element)">
+            <mat-icon>border_color</mat-icon>
+        </button>
+    </td> 
+  </ng-container>
+
+  <!--Youtube url button-->
+  <ng-container matColumnDef="youtube">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element"> 
+        <button 
+        mat-icon-button 
+        onclick="document.getElementById('youtubeId').style.display='block'"
+        *ngIf="hasUrl(element)" 
+        matTooltip="click to watch video" 
+        (click)="setUrlToTrue(element)">
+            <mat-icon>music_video</mat-icon>
+        </button>
+    </td> 
+  </ng-container>
+  
+
+  <tr mat-header-row *matHeaderRowDef="todoDisplayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: todoDisplayedColumns;">
+  </tr>
+</table>
+<br>
+<button mat-button color="primary" matTooltip="click to move selected tasks to tasks" [disabled]="!donedoSelection.hasValue()" (click)="moveToToDoSelectedTodo()">UnDone</button>
+<!--Delete all button disabled if nothing is selected-->
+<button mat-button color="primary" matTooltip="click to delete selected tasks" [disabled]="!donedoSelection.hasValue()" (click)="deleteSelectedDonedo()">Delete</button>
+<br>
+ <!--Done Table-->
+<table mat-table [dataSource]="donedoDataSource" class="mat-elevation-z8">
+
+    <!-- Checkbox Column -->
     <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()"
-                        [aria-label]="checkboxLabel()">
-            </mat-checkbox>
+        <mat-checkbox (change)="$event ? masterToggleDonedo() : null"
+                        [checked]="donedoSelection.hasValue() && isAllSelectedDonedo()"
+                        [indeterminate]="donedoSelection.hasValue() && !isAllSelectedDonedo()"
+                        [aria-label]="checkboxLabelDonedo()">
+        </mat-checkbox>
         </th>
         <td mat-cell *matCellDef="let row">
-            <mat-checkbox (click)="$event.stopPropagation()"
-                        (change)="$event ? selection.toggle(row) : null"
-                        [checked]="selection.isSelected(row)"
-                        [aria-label]="checkboxLabel(row)">
-            </mat-checkbox>
+        <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? donedoSelection.toggle(row) : null"
+                        [checked]="donedoSelection.isSelected(row)"
+                        [aria-label]="checkboxLabelDonedo(row)">
+        </mat-checkbox>
         </td>
     </ng-container>
+    
     
     <!-- Tasks Column -->
     <ng-container matColumnDef="task">
-        <th mat-header-cell *matHeaderCellDef> Tasks </th>
-        <td mat-cell *matCellDef="let element"> 
-                <mat-form-field class="tasks-input" color="primary">
-                    <input matInput type="text" placeholder="Click to edit" [(ngModel)]="element.task">
-                </mat-form-field>
+        <th mat-header-cell *matHeaderCellDef> Done Tasks </th>
+        <td class="disabled" mat-cell *matCellDef="let element"> 
+            {{element.task}}
         </td>
     </ng-container>
     
+    <!--Undone Button-->
+    <ng-container matColumnDef="done">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element"> 
+            <button mat-icon-button matTooltip="click to move to Tasks" color="primary" (click)="moveToUndone(element)">
+                <mat-icon>remove</mat-icon>
+            </button>
+        </td>
+    </ng-container>
     
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+    <!--Remove Button-->
+    <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element"> 
+            <button mat-icon-button matTooltip="click to delete task" color="warn" (click)="removeFromDone(element)">
+                <mat-icon>highlight_off</mat-icon>
+            </button>
+        </td>
+    </ng-container>
+
+    <!--Youtube url button-->
+    <ng-container matColumnDef="youtube">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element"> 
+            <button 
+            mat-icon-button 
+            onclick="document.getElementById('youtubeId').style.display='block'"
+            *ngIf="hasUrl(element)" 
+            matTooltip="click to watch video" 
+            (click)="setUrlToTrue(element)">
+                <mat-icon>music_video</mat-icon>
+            </button>
+        </td> 
+    </ng-container>
+    
+    
+    <tr mat-header-row *matHeaderRowDef="donedoDisplayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: donedoDisplayedColumns;">
+    </tr>
     </table>
-      
-      
+</div>
+
+<div id="youtubeId" class="modal" (click)="resetUrl()" onclick="document.getElementById('youtubeId').style.display='none'">
+    <div class="modal-content animate" >
+        <div class="video-container" *ngIf="showUrl" >
+                <youtube-player  class="youtube-player"
+                [videoId]="youtubeId"
+                [height]="390"
+                [width]="640"
+                (ready)="savePlayer($event)"
+                [playerVars]="playerVars">
+                </youtube-player>
+        </div>
+    </div>
+</div>
+
+
+
+ 
+
+
+
+
+
+
+
+
 
 

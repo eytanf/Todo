@@ -13,6 +13,9 @@ let Task = new Schema({
     },
     taskOwnerId: {
         type: String
+    },
+    url: {
+        type: String
     }
 });
 

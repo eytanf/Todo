@@ -1,4 +1,5 @@
 
+
 <header *ngIf="!loggedIn; else elseBlock">
     <mat-toolbar color="primary">
         <!--Logo-->
@@ -6,24 +7,30 @@
         <!--Spaced for toolbar-->
         <span class="toolbar-spacer"></span>
         <!--Button to open signin model-->
-        <button mat-button class="signinBtn" onclick="document.getElementById('signInModal').style.display='block'"><b>Login</b></button>
+        <button 
+        mat-button 
+        class="signinBtn" 
+        onclick="document.getElementById('signInModal').style.display='block'"
+        ><b>Login</b></button>
         <!--Button to open signup model-->
-        <button mat-button class="signupBtn" onclick="document.getElementById('signUpModal').style.display='block'">
+        <button 
+        mat-button 
+        class="signupBtn" 
+        onclick="document.getElementById('signUpModal').style.display='block'">
             <b>Register</b>
         </button>
     </mat-toolbar>
     
     <h1><b>Welcome to Todo application</b></h1>
-    <p>The application allow user to submit personal tasks to be saved in our database and configure it with many features for the user to make a <b style="color:white">Perfect</b> todo list</p>
+    <p>The application allow user to submit personal tasks to be saved in our database and configure it with many features for the user to make a <b style="color:red">Perfect</b> todo list</p>
     <p>Please Register or Login to continue...</p>
     <!--Sign up pannel-->
     
-    <div id="signUpModal" class="modal">
+    <div id="signUpModal"  class="modal">
             <!-- Modal Content -->
-            <form class="modal-content animate" >
+            <form class="modal-content animate" id="myForm" >
             <div class="container">
                 <!--Email input-->
-                <label for="email"><b>eMail:</b></label>
                 <br>
                 <mat-form-field>
                     <input 
@@ -33,16 +40,14 @@
                     #regEmail 
                     (focusin)="resetIsExists()"
                     type="text" 
-                    placeholder="Enter eMail" 
+                    placeholder="eMail" 
                     name="email" 
+                    [errorStateMatcher]="matcher"
                     required>
                 </mat-form-field>
                 <br>
                 <label class="error" *ngIf=!validateEmail(regInput)>email is not valid</label>
-                <br>
                 <!--Password input-->
-                <label for="psw"><b>Password:</b></label>
-                <br>
                 <mat-form-field>
                     <input 
                     matInput
@@ -51,14 +56,13 @@
                     #regPass 
                     (focusin)="isClickedFunc()"
                     type="password" 
-                    placeholder="Enter Password" 
+                    placeholder="Password" 
                     name="psw" 
+                    [errorStateMatcher]="matcher"
                     required>
                 </mat-form-field>
                 <br>
                 <!--Check password input-->
-                <label for="psw"><b>Check Password:</b></label>
-                <br>
                 <mat-form-field>
                     <input 
                     matInput
@@ -67,22 +71,29 @@
                     #checkPassword 
                     (focusin)="isClickedFunc()"
                     type="password" 
-                    placeholder="Enter Password" 
+                    placeholder="Confirmed Password" 
+                    [errorStateMatcher]="matcher"
                     name="psw" 
                     required>
                 </mat-form-field>
+                <div class="myBtns">
                 <br>
                 <label class="error" *ngIf="!isPassMatch(regPass.value , checkPassword.value)">password does not match</label>
-                <br>
                 <label class="error" *ngIf=!isPassValid(regPass.value)>password is not valid</label>
-                <br>
                 <label class="error" *ngIf=isUserExistFunc()>user already exist</label>
                 <br>
                 <!--Resister button-->
-                <button mat-button type="submit"  (click)="register(regEmail.value , regPass.value , checkPassword.value)" 
+                <button mat-button class="modalBtnIn"  type="submit" (click)="register(regEmail.value , regPass.value , checkPassword.value)" 
                 >Register</button >
                 <!--Cancel button-->
-                <button mat-button type="button" style='float: right;' onclick="document.getElementById('signUpModal').style.display='none'" class="cancelbtn" (click)="clean()">Cancel</button>
+                <button 
+                mat-button 
+                type="button" 
+                style='float: right;
+                'onclick="document.getElementById('signUpModal').style.display='none'"
+                 class="modalBtnOut" 
+                 (click)="clean()"
+                 >Cancel</button></div>
             </div>
         </form>
     </div>
@@ -92,10 +103,9 @@
     <!--Sign in pannel-->
     <div id="signInModal" class="modal">
             <!-- Modal Content -->
-            <form class="modal-content animate" >
+            <form class="modal-content-Signin animate" >
             <div class="container">
                 <!--Email input-->
-                <label for="email"><b>eMail:</b></label>
                 <div>
                     <mat-form-field>
                         <input 
@@ -103,23 +113,23 @@
                         [(ngModel)]="logInput" 
                         [ngModelOptions]="{standalone: true}" 
                         #logEmail type="text" 
-                        placeholder="Enter eMail" 
+                        placeholder="eMail" 
                         name="email" 
+                        [errorStateMatcher]="matcher"
                         required>
                     </mat-form-field>
                     <br>
                     <label class="error" *ngIf=!validateEmail(logInput)>email is not valid</label>
                 </div>
-                <br>
                 <!--Password input-->
-                <label for="psw"><b>Password:</b></label>
                 <mat-form-field>
                     <input 
                     matInput 
                     [(ngModel)]="logPassword" 
                     [ngModelOptions]="{standalone: true}" 
                     #logPass type="password" 
-                    placeholder="Enter Password" 
+                    placeholder="Password" 
+                    [errorStateMatcher]="matcher"
                     name="psw" 
                     required>
                 </mat-form-field>
@@ -127,11 +137,13 @@
                 <!--Pop on click and check if user and password are valid-->
                 <label class="error" *ngIf=!isUserValidFunc(logPass.value)>please enter valid email and password</label>
                 <br>
+                <div class="myBtns">
                 <!--Login button-->
                 <button
                 mat-button
                 id="loginBtn" 
                 type="submit" 
+                class="modalBtnIn"
                 (click)='login(logEmail.value,logPass.value)'
                 >Login</button>
                 <!--Cancel button-->
@@ -140,10 +152,11 @@
                 type="button" 
                 style='float: right;' 
                 onclick="document.getElementById('signInModal').style.display='none'" 
-                class="cancelbtn"
+                class="modalBtnOut"
                 (click)="clean()">
                     Cancel
                 </button>
+            </div>
             </div>
         </form>
     </div>
