@@ -58,7 +58,7 @@ export class TodoListComponent implements OnInit {
 
   // Youtube url checker
   isValidUrl(url) {
-    var re = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+/;
+    var re = /^(http(s)?:\/\/)?((w){3}\.)?youtu(be|.be)?(\.com)?\/.+/;
       return re.test(String(url).toLowerCase()) || url.length == 0 ;
   }
 
@@ -77,7 +77,7 @@ export class TodoListComponent implements OnInit {
       this.donedoDataSource = new MatTableDataSource<Task>(this.donedos);
     });
   }
-
+  
   resetEmptyTask(){
     this.emptyTask = false;
   }

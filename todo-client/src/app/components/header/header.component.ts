@@ -1,10 +1,11 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Output, Inject } from '@angular/core';
 import { UserService } from '../../user.service';
 import { Router } from '@angular/router';
 import { TodoListComponent } from '../todo-list/todo-list.component';
 import { FormControl, FormGroupDirective, NgForm, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import {ErrorStateMatcher} from '@angular/material/core';
+import { MatDialog} from '@angular/material';
 
 
 export class MyErrorStateMatcher implements ErrorStateMatcher  {
@@ -33,7 +34,12 @@ export class HeaderComponent implements OnInit {
   isUserExist: boolean = false;
   matcher = new MyErrorStateMatcher();
 
-  constructor(private userService: UserService , private router:Router , private todo: TodoListComponent , private cookieService: CookieService , private fb: FormBuilder) {}
+  constructor(private userService: UserService 
+    , private router:Router 
+    , private todo: TodoListComponent 
+    , private cookieService: CookieService 
+    , private fb: FormBuilder
+    , private dialog: MatDialog) {}
    
   
   @Output() userName: string = '';
@@ -170,3 +176,4 @@ clean(){
 
 
 }
+

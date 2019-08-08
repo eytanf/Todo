@@ -4,7 +4,21 @@
     font-size: 200%;
 }
 
+:host ::ng-deep .mat-checkbox-inner-container-no-side-margin{
+  margin-right: 8px;
+}
 
+.taskColumnClass{
+  width: 100%;
+}
+
+.taskInputClass{
+  width: 100%;
+}
+
+:host ::ng-deep .mat-form-field .mat-form-field-infix{
+  width: 0%;
+}
 
 
 .toolbar-spacer {
@@ -23,16 +37,13 @@
 .button-group {
   position: absolute;
   left: 25%;
-  margin: 1;
-  width: 45%;
+  width: 55%;
 }
 .button{
     color:white;
     background-color: darkblue; 
      
 }
-
-
 
 .disabled{
     color: gray;
@@ -112,27 +123,20 @@
     .button-group {
       position: absolute;
       left: 0%;
-      margin: 1;
-      width: 45%;
+      width: 90%;
+      padding: 5%;
     }
 
     .title{
-      padding-left: 0%;
+      padding-left: 5%;
     }
-
-    :host ::ng-deep .mat-form-field-wrapper{
-      max-width: 150px;
-    
-    }
+   
 
     :host ::ng-deep youtube-player iframe{
-      width: 300px;
-      height: 150px;
+      width: 300%;
+      height: 100%;
     }
 
-    .modal-content{
-      padding-right: 60%;
-    }
   
   }
 

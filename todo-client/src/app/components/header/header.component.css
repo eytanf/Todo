@@ -95,15 +95,15 @@ form {
     left: 5px;
   }
 
-  @media screen and (max-width: 992px) {
+  /* @media screen and (max-width: 992px) {
     .modal-content {
-      width: 160px; /* Full width */
+      width: 160px; 
       height: 260px;
       overflow: hidden;
       font-size: 12px;
     }
     .modal-content-Signin {
-      width: 160px; /* Full width */
+      width: 160px; 
       height: 150px;
       overflow: hidden;
       font-size: 12px;
@@ -128,7 +128,7 @@ form {
     }
   }
   
-/* On screens that are 600px or less, set the background color to olive */
+
 @media screen and (max-width: 700px) {
    .modal-content {
     width: 130px; 
@@ -154,7 +154,7 @@ form {
     font-size: 10px;
   } 
   
-}
+} */
 
 
   

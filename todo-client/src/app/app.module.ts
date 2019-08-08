@@ -23,6 +23,7 @@ import { MatButtonModule ,
   MatFormFieldModule,
   MatTooltipModule,
   MatSidenavModule,
+  MatSelectModule
  } from '@angular/material';
 
 
@@ -45,6 +46,7 @@ export function tokenGetter() {
     routingComponents[1]
   ],
   imports: [
+    MatSelectModule,
     NgbModule,
     FlexLayoutModule,
     ReactiveFormsModule ,
