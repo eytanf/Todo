@@ -1,0 +1,40 @@
+<table  class="todoTable">
+        <!--Headline for the table-->
+        <tr>
+            <td><b>Tasks to do</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <!--iterate on todos array and give each task a button to set as done and another to remove-->
+        <tr *ngFor="let task of todos.slice().reverse() ">
+            <!--the task-->
+            <td><input class="updateInput" #updateTask [(ngModel)]="task.task" (focusout)="updateField(task)" id="myUpdateInput" (keyup.enter)="updateField(task)"></td>
+            <!--Done button-->
+            <td class="checkBox"><a class="checkBoxBtn" type="button" (click)="moveToDone(task)"><img></a></td>
+            <!--Remove button-->
+            <td class="checkBox"><a class="removeBoxBtn" type="button" (click)="removeFromTodo(task)"><img></a></td>
+            <!--Uptate button-->
+            <td class="checkBox"><a class="updateBtn" type="button" (click)=updateField(task)><img></a></td>
+        </tr>
+    </table>
+    <br>
+    <!--Visual table with the tasks from donedos-->
+    <table>
+        <!--Headline for the table-->
+        <tr>
+            <td><b>Tasks done</b></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <!--iterate on donedos array and give each task a button to set as done and another to remove-->
+        <tr *ngFor="let task of donedos.slice().reverse() ">
+            <!--the task-->
+            <td class="disabled">{{task.task}}</td>
+            <!--Done button-->
+            <td class="checkBox"><a class="rotateBtn"  type="button" (click)="moveToUndone(task)"><img></a></td>
+            <!--Remove button-->
+            <td class="checkBox"><a class="removeBoxBtn"  type="button" (click)="removeFromDone(task)"><img></a></td>
+        </tr>
+    </table>
+    <br>

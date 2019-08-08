@@ -3,7 +3,7 @@
     <mat-toolbar color="primary">
         <img src="../../../assets/edit (1).png">
         <span class="a-bit-right"></span>
-        Welcome {{currentUser}}
+        Welcome to Todo app!
         <span class="toolbar-spacer"></span>
         <button mat-button class="signoutBtn" (click)="logout()">
             <b>LogOut</b>
@@ -12,49 +12,58 @@
 </div>
 <h1 class="title">Please insert a Task:</h1>
 <!--Input to insert new tasks to do-->
-<input class="input" #task [(ngModel)]="value" type="text" id="myInput" (keyup.enter)="add(task.value)" placeholder="Insert task.."  >
+<mat-form-field class="tasks-input" color="primary">
+<input 
+matInput color="primary"
+#task 
+[(ngModel)]="value" 
+type="text" 
+id="myInput" 
+(keyup.enter)="add(task.value)" 
+placeholder="Insert task.." >
+</mat-form-field>
 <!--Button to submit the client task to our data base (enter also works)-->
-<button class="button" id="myButton" (click)="add(task.value)">Add</button>
+<button mat-raised-button class="button" id="myButton" (click)="add(task.value)">Add</button>
 <br><br>
 <!--Visual table with the tasks from todo-->
-<table class="todoTable">
-    <!--Headline for the table-->
-    <tr>
-        <td><b>Tasks to do</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <!--iterate on todos array and give each task a button to set as done and another to remove-->
-    <tr *ngFor="let task of todos.slice().reverse() ">
-        <!--the task-->
-        <td><input class="updateInput" #updateTask [(ngModel)]="task.task" (focusout)="updateField(task)" id="myUpdateInput" (keyup.enter)="updateField(task)"></td>
-        <!--Done button-->
-        <td class="checkBox"><a class="checkBoxBtn" type="button" (click)="moveToDone(task)"><img></a></td>
-        <!--Remove button-->
-        <td class="checkBox"><a class="removeBoxBtn" type="button" (click)="removeFromTodo(task)"><img></a></td>
-        <!--Uptate button-->
-        <td class="checkBox"><a class="updateBtn" type="button" (click)=updateField(task)><img></a></td>
-    </tr>
-</table>
-<br>
-<!--Visual table with the tasks from donedos-->
-<table>
-    <!--Headline for the table-->
-    <tr>
-        <td><b>Tasks done</b></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <!--iterate on donedos array and give each task a button to set as done and another to remove-->
-    <tr *ngFor="let task of donedos.slice().reverse() ">
-        <!--the task-->
-        <td class="disabled">{{task.task}}</td>
-        <!--Done button-->
-        <td class="checkBox"><a class="rotateBtn"  type="button" (click)="moveToUndone(task)"><img></a></td>
-        <!--Remove button-->
-        <td class="checkBox"><a class="removeBoxBtn"  type="button" (click)="removeFromDone(task)"><img></a></td>
-    </tr>
-</table>
-<br>
+
+<table mat-table  [dataSource]="todos" class="mat-elevation-z8">
+
+    <!--- Note that these columns can be defined in any order.
+            The actual rendered columns are set as a property on the row definition" -->
+
+    <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+        </td>
+    </ng-container>
+    
+    <!-- Tasks Column -->
+    <ng-container matColumnDef="task">
+        <th mat-header-cell *matHeaderCellDef> Tasks </th>
+        <td mat-cell *matCellDef="let element"> 
+                <mat-form-field class="tasks-input" color="primary">
+                    <input matInput type="text" placeholder="Click to edit" [(ngModel)]="element.task">
+                </mat-form-field>
+        </td>
+    </ng-container>
+    
+    
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+    </table>
+      
+      
+
 

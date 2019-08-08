@@ -14,7 +14,8 @@ import { MatButtonModule ,
   MatTableModule, 
   MatPaginatorModule,
   MatSortModule ,
-  MatDialogModule} from '@angular/material';
+  MatDialogModule,
+  MatCheckboxModule } from '@angular/material';
 
 
 import { AppComponent } from './app.component';
@@ -36,6 +37,7 @@ export function tokenGetter() {
     routingComponents[1]
   ],
   imports: [
+    MatCheckboxModule,
     MatInputModule, 
     MatTableModule, 
     MatPaginatorModule,

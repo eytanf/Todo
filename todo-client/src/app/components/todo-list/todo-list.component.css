@@ -10,37 +10,30 @@
     flex: 0.01 0.01 auto;
 }
 
-.input{
-    width: 48%;
-    border: 2px solid darkblue;
-    background-image: url('../../../assets/clipboards.png');
-    background-repeat: no-repeat;
-    padding-left: 20px;
+.tasks-input{
+    width: 50%;
 }
 
 .button{
     color:white;
     background-color: darkblue;
-    border: none;
-    text-align: center;
-    padding: 3px 15px;
 }
 
-table{
+/* table{
     width: 50%;
     border-collapse: collapse;
     background-color: white;
-}
+} */
 
-.checkBox{
+/* .checkBox{
     width: 10%;
-}
+} */
 
-table, th, tr , td{
+/* table, th, tr , td{
     border: 3px solid black;
     color: darkblue;
 
-}
+} */
 
 .print{
     color: darkblue;
@@ -105,4 +98,8 @@ header{
 .signoutBtn{
     color: white;
  }
+
+ table {
+    width: 40%;
+  }
 

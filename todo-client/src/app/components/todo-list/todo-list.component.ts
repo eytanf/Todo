@@ -3,7 +3,21 @@ import { TaskService } from '../../task.service';
 import { Task } from '../../task.model'
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { TmplAstElement } from '@angular/compiler';
+import {MatTableDataSource} from '@angular/material/table';
+import {SelectionModel} from '@angular/cdk/collections';
+
+export interface Task {
+  _id: string;
+  task: string;
+  complete: boolean;
+}
+
+const ELEMENT_DATA: Task[] = [
+  {_id: '1', task: 'Hydrogen', complete: false},
+  {_id: '2', task: 'Helium', complete: false},
+];
+
+
 
 @Component({
   selector: '[app-todo-list]',
@@ -15,7 +29,8 @@ export class TodoListComponent implements OnInit {
   todos: Task[]; //Task's to do
   donedos: Task[];//Task's that are done
   value: string = '';//Input field string
-  currentUser: string = '';
+
+  
   constructor(private taskService: TaskService , private router:Router, private cookieService: CookieService)  { }
 
   //Invoked when the website is launched
@@ -27,7 +42,7 @@ export class TodoListComponent implements OnInit {
       this.todos = [];
       this.donedos = []; 
       this.updateDonedosFromDataBase();
-      this.updateTodoFromDataBase(); 
+      this.updateTodoFromDataBase();
     }
     else{
       this.router.navigate(['/signin']);
@@ -56,7 +71,7 @@ export class TodoListComponent implements OnInit {
       return null;
     }
     //Add a new task to the database calling api functions
-    this.taskService.addTask(task , false).subscribe((_id:number) => {
+    this.taskService.addTask(task , false).subscribe((_id:string) => {
       const taskToPush = new Task(_id , task , false);
       this.todos.push(taskToPush);
     });
@@ -138,13 +153,42 @@ export class TodoListComponent implements OnInit {
       }
     }
   }
-
+  //Clear on logout and delete cookies
   logout(){
     this.todos = [];
     this.donedos = [];
     this.cookieService.delete("token");
     this.ngOnInit();
     }
+    
+    //Data for material
+    displayedColumns: string[] = ['task'];
+    dataSource = new MatTableDataSource<Task>(this.todos);
+    selection = new SelectionModel<Task>(true, []);
 
-
+    isAllSelected() {
+      const numSelected = this.selection.selected.length;
+      const numRows = this.dataSource.data.length;
+      return numSelected === numRows;
+    }
+  
+    /** Selects all rows if they are not all selected; otherwise clear selection. */
+    masterToggle() {
+      this.isAllSelected() ?
+          this.selection.clear() :
+          this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+  
+    /** The label for the checkbox on the passed row */
+    checkboxLabel(row?: Task): string {
+      if (!row) {
+        console.log(false);
+        return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+      }
+      else{
+        console.log(true);
+      }
+      return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${this.dataSource.data.length + 1}`;
+    }
+    
 }
