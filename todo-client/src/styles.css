@@ -5,7 +5,8 @@ html, body {
      height: 100%; 
     }
 body { 
-    margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+    margin: 0; 
+    font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 
     /* On screens that are 992px or less, set the background color to blue */

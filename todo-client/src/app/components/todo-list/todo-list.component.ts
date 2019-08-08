@@ -50,6 +50,7 @@ export class TodoListComponent implements OnInit {
       this.donedos = []; 
       this.updateDonedosFromDataBase();
       this.updateTodoFromDataBase();
+      this.changeToNormal();
     }
     else{
       this.router.navigate(['/signin']);
@@ -302,6 +303,52 @@ export class TodoListComponent implements OnInit {
   savePlayer(player) {
     this.player = player;
   }
+
+  changeToGreen(){
+    document.getElementsByName('changeColor').forEach((obj) => {
+      obj.style.color = 'lightgreen';
+      obj.style.fontFamily = 'Serif'
+    }) 
+    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
+      obj.style.backgroundColor = 'lightgreen';
+      obj.style.fontFamily = 'Serif'
+    })
+  }
+
+  changeToYellow(){
+    document.getElementsByName('changeColor').forEach((obj) => {
+      obj.style.color = 'yellow';
+      obj.style.fontFamily = 'Georgia'
+    }) 
+    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
+      obj.style.backgroundColor = 'yellow';
+      obj.style.fontFamily = 'Georgia'
+    })
+  }
+
+  changeToRed(){
+    document.getElementsByName('changeColor').forEach((obj) => {
+      obj.style.color = 'red';
+      obj.style.fontFamily = 'cursive'
+    }) 
+    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
+      obj.style.backgroundColor = 'red';
+      obj.style.fontFamily = 'cursive'
+    })
+  }
+
+  changeToNormal(){
+    document.getElementsByName('changeColor').forEach((obj) => {
+      obj.style.color = '#3F51B5';
+      obj.style.fontFamily = 'Sans-serif'
+    }) 
+    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
+      obj.style.backgroundColor = '#3F51B5';
+      obj.style.fontFamily = 'Sans-serif'
+    })
+  }
+
+  
   
   
 

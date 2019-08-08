@@ -1,11 +1,29 @@
 .title{
-    color: hsl(240, 100%, 27%);
+    color: #3F51B5;
     padding-left: 40%;
     font-size: 200%;
 }
 
 :host ::ng-deep .mat-checkbox-inner-container-no-side-margin{
   margin-right: 8px;
+}
+
+.fontChanger{
+  float: right;
+  display: flex;
+  
+}
+
+.green{
+  background-color: lightgreen;
+}
+
+.yellow{
+  background-color: yellow;
+}
+
+.red{
+  background-color: red;
 }
 
 .taskColumnClass{
@@ -39,11 +57,7 @@
   left: 25%;
   width: 55%;
 }
-.button{
-    color:white;
-    background-color: darkblue; 
-     
-}
+
 
 .disabled{
     color: gray;

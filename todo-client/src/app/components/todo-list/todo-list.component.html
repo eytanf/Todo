@@ -1,17 +1,33 @@
 
 <div class="header" style="text-align: right" >
-    <mat-toolbar color="primary">
+    <mat-toolbar name="changeBackgroundColor" color="primary">
         <img src="../../../assets/edit (1).png">
         <span class="a-bit-right"></span>
         Welcome to Todo app!
         <span class="toolbar-spacer"></span>
-        <button mat-button class="signoutBtn" (click)="logout()">
+        <button mat-button name="changeBackgroundColor" class="signoutBtn" (click)="logout()">
             <b>LogOut</b>
         </button>
     </mat-toolbar>
 </div>
+<!--Font buttons-->
+<div class="fontChanger" fxLayout="row" fxLayout.xs="columns" fxLayoutWrap fxLayoutGap="0.5%" fxLayoutAlign="center" >
+    <div fxFlex="100%">
+        <button class="green" mat-mini-fab matTooltip="click to change the font to green" (click)="changeToGreen()"></button>
+    </div>
+    <div fxFlex="100%">
+        <button class="yellow" mat-mini-fab matTooltip="click to change the font to yellow" (click)="changeToYellow()"></button>
+    </div>
+    <div fxFlex="100%">
+        <button class="red" mat-mini-fab matTooltip="click to change the font to red" (click)="changeToRed()"></button>
+    </div>
+    <div fxFlex="100%">
+        <button mat-mini-fab matTooltip="click to change the font back to normal" color="primary" (click)="changeToNormal()"></button>
+    </div>
+</div>
 
-<h1 class="title">Insert a task to begin!</h1>
+<h1 class="title" name="changeColor">Insert a task to begin!</h1>
+
 <!--Input to insert new tasks to do-->
 <mat-form-field class="tasks-input" color="primary">
     <input 
@@ -45,9 +61,10 @@
 <br>
 <div class="button-group">
 <button 
+mat-button color="primary"
 mat-raised-button matTooltip="click to insert a new task" 
 class="button" 
-id="myButton" 
+name="changeBackgroundColor" 
 (click)="add(task.value , url.value)">
     Submit
 </button>
