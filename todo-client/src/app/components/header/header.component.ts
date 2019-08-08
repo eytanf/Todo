@@ -120,13 +120,14 @@ export class HeaderComponent implements OnInit {
   //Send a register request to the server after validating the password match the check password
   register(email , password , checkPassword){
     this.isClicked = true;
-    if(password.length > 0 && password === checkPassword && this.validateEmail(email)){
+    if(password.length > 0 && password === checkPassword && this.validateEmailReg()){
       this.userService.addUser(email , password).subscribe(() => {
         this.login(email , password);
         document.getElementById('signUpModal').style.display='none';
       },(error) => {
         if(error.status == 409){
           this.isUserExist = true;
+          
         }
         this.matcher.realIsSubmitted = true;
         this.isClicked = false;

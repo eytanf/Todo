@@ -39,7 +39,6 @@ export class UserService {
     }
     
     this.http.post(`${this.uri}/token`,tokenToStore).subscribe((res:any) => {
-      console.log(true)
     });
   }
 }
