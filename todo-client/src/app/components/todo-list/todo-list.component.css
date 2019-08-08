@@ -102,6 +102,10 @@
   
 
   @media screen and (max-width: 992px) {
+    :host ::ng-deep youtube-player iframe{
+      width: 500px;
+      height: 300px;
+    }
   }
 
   @media screen and (max-width: 600px) {

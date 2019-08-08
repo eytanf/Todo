@@ -28,15 +28,14 @@
     
     <div id="signUpModal"  class="modal">
             <!-- Modal Content -->
-            <form class="modal-content animate" id="myForm" >
+            <form class="modal-content animate" id="myForm" [formGroup]="registerForm" >
             <div class="container">
                 <!--Email input-->
                 <br>
                 <mat-form-field>
                     <input 
                     matInput 
-                    [(ngModel)]="regInput" 
-                    [ngModelOptions]="{standalone: true}" 
+                    formControlName="regInput"
                     #regEmail 
                     (focusin)="resetIsExists()"
                     type="text" 
@@ -46,13 +45,12 @@
                     required>
                 </mat-form-field>
                 <br>
-                <label class="error" *ngIf=!validateEmail(regInput)>email is not valid</label>
+                <label class="error" *ngIf=!validateEmailReg()>email is not valid</label>
                 <!--Password input-->
                 <mat-form-field>
                     <input 
                     matInput
-                    [(ngModel)]="regPassword" 
-                    [ngModelOptions]="{standalone: true}" 
+                    formControlName="regPassword" 
                     #regPass 
                     (focusin)="isClickedFunc()"
                     type="password" 
@@ -66,8 +64,7 @@
                 <mat-form-field>
                     <input 
                     matInput
-                    [(ngModel)]="checkPass" 
-                    [ngModelOptions]="{standalone: true}"
+                    formControlName="checkPass" 
                     #checkPassword 
                     (focusin)="isClickedFunc()"
                     type="password" 
@@ -89,8 +86,7 @@
                 <button 
                 mat-button 
                 type="button" 
-                style='float: right;
-                'onclick="document.getElementById('signUpModal').style.display='none'"
+                onclick="document.getElementById('signUpModal').style.display='none'"
                  class="modalBtnOut" 
                  (click)="clean()"
                  >Cancel</button></div>
@@ -103,15 +99,14 @@
     <!--Sign in pannel-->
     <div id="signInModal" class="modal">
             <!-- Modal Content -->
-            <form class="modal-content-Signin animate" >
+            <form class="modal-content-Signin animate" [formGroup]="loginForm" >
             <div class="container">
                 <!--Email input-->
                 <div>
                     <mat-form-field>
                         <input 
                         matInput 
-                        [(ngModel)]="logInput" 
-                        [ngModelOptions]="{standalone: true}" 
+                        formControlName="logInput"
                         #logEmail type="text" 
                         placeholder="eMail" 
                         name="email" 
@@ -119,14 +114,13 @@
                         required>
                     </mat-form-field>
                     <br>
-                    <label class="error" *ngIf=!validateEmail(logInput)>email is not valid</label>
+                    <label class="error" *ngIf=!validateEmailLog()>email is not valid</label>
                 </div>
                 <!--Password input-->
                 <mat-form-field>
                     <input 
                     matInput 
-                    [(ngModel)]="logPassword" 
-                    [ngModelOptions]="{standalone: true}" 
+                    formControlName="logPassword" 
                     #logPass type="password" 
                     placeholder="Password" 
                     [errorStateMatcher]="matcher"
@@ -149,8 +143,7 @@
                 <!--Cancel button-->
                 <button 
                 mat-button
-                type="button" 
-                style='float: right;' 
+                type="button"  
                 onclick="document.getElementById('signInModal').style.display='none'" 
                 class="modalBtnOut"
                 (click)="clean()">

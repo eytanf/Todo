@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 import { UserService } from '../../user.service';
 import { Router } from '@angular/router';
 import { TodoListComponent } from '../todo-list/todo-list.component';
@@ -8,12 +8,9 @@ import {ErrorStateMatcher} from '@angular/material/core';
 
 
 export class MyErrorStateMatcher implements ErrorStateMatcher  {
-  // realControl;
-  // constructor(realControl: FormControl){
-  //   this.realControl = realControl;
-  // }
+  realIsSubmitted = false;
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
+    const isSubmitted = form && form.submitted && this.realIsSubmitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
   }
 }
@@ -24,9 +21,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher  {
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  @ViewChild(FormGroupDirective)
-  formGroupDirective: FormGroupDirective;
-  signupForm: FormGroup;
+  registerForm: FormGroup;
+  loginForm: FormGroup;
   logInput: string = "";
   regInput: string = "";
   regPassword: string ="";
@@ -37,16 +33,7 @@ export class HeaderComponent implements OnInit {
   isUserExist: boolean = false;
   matcher = new MyErrorStateMatcher();
 
-  constructor(private userService: UserService 
-    , private router:Router 
-    , private todo: TodoListComponent 
-    , private cookieService: CookieService,
-    fb: FormBuilder) {
-      this.signupForm = fb.group({
-        username: [null, Validators.required],
-        fruit: [null, Validators.required]
-      })
-    }
+  constructor(private userService: UserService , private router:Router , private todo: TodoListComponent , private cookieService: CookieService , private fb: FormBuilder) {}
    
   
   @Output() userName: string = '';
@@ -55,6 +42,15 @@ export class HeaderComponent implements OnInit {
       if(this.cookieService.get("token")){
       this.router.navigate(['/main']);
     }
+    this.registerForm = this.fb.group({
+      regInput: [null, Validators.required],
+      regPassword: [null, Validators.required],
+      checkPass: [null, Validators.required]
+    })
+    this.loginForm = this.fb.group({
+      logInput: [null , Validators.required],
+      logPassword: [null , Validators.required]
+    })
   }
   //Send login request to the server and store the token in our locastorage
   //set loggedIn as true and save userName to display
@@ -69,6 +65,7 @@ export class HeaderComponent implements OnInit {
       this.ngOnInit();
       
     },error => this.isUserValid = false);
+    this.matcher.realIsSubmitted = true;
     
   }
   //Called when focused on inputs to reset errors
@@ -131,14 +128,28 @@ export class HeaderComponent implements OnInit {
         if(error.status == 409){
           this.isUserExist = true;
         }
+        this.matcher.realIsSubmitted = true;
         this.isClicked = false;
       });
     }
+    this.matcher.realIsSubmitted = true;
   }
+
   //Check if email is valid
-  validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase()) || email.length == 0;
+  validateEmailReg() {
+    if(this.registerForm.get('regInput').value){
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(this.registerForm.get('regInput').value).toLowerCase()) && this.registerForm.get('regInput').value.length != 0;
+    }
+    return true;
+  } 
+
+  validateEmailLog() {
+    if(this.loginForm.get('logInput').value){
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(this.loginForm.get('logInput').value).toLowerCase()) && this.loginForm.get('logInput').value.length != 0;
+    }
+    return true;
   } 
 
 //Clean all text input when closing login or register form
@@ -151,13 +162,9 @@ clean(){
   this.isClicked = false;
   this.isUserValid = false;
   this.isUserExist = false;
-  console.log(this.signupForm.value)
-  this.signupForm.reset();
-  // This doesn't work alone, as we know
-  this.signupForm.reset();
-
-  // This is needed to clear the 'submitted' state
-  this.formGroupDirective.resetForm();
+  this.registerForm.reset();
+  this.loginForm.reset();
+  this.matcher.realIsSubmitted = false;
 }
 
 
