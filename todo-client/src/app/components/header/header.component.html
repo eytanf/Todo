@@ -69,7 +69,9 @@
                 <div class="myBtns">
                 <br>
                 <label class="error" *ngIf="!isPassMatch(regPass.value , checkPassword.value)">password does not match</label>
+                <br>
                 <label class="error" *ngIf=!isPassValid(regPass.value)>password is not valid</label>
+                <br>
                 <label class="error" *ngIf=isUserExistFunc()>user already exist</label>
                 <br>
                 <button mat-button class="modalBtnIn"  type="submit" (click)="register(regEmail.value , regPass.value , checkPassword.value)" 

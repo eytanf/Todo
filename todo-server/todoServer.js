@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const session = require('express-session');
 
 const Task = require('./models/task');
 const User = require('./models/user');
@@ -13,7 +14,22 @@ const app = express();
 const router = express.Router();
 
 app.use(cors());
+app.use(session({
+    saveUnitialized: false,
+    secret: 'server',
+    cookie:{
+        maxAge: 1000 * 60 * 60 * 2,
+        sameSite: true, // might check it 
+        resave: false
+    }
+}))
 app.use(bodyParser());
+app.get('/',(req , res) => {
+    res.status(200).send({msg: 'Hello World!'});
+});
+app.listen(4100 , () => console.log('Express server running on port 4100'));
+app.use('/' , router);
+
 
 mongoose.connect('mongodb://localhost:27017/tasks');
 
@@ -91,7 +107,7 @@ router.route('/tasksDone/:id').get((req , res) => {
 });
 
 //Add a new task to the tasks database
-router.route('/tasks/add').post(verify,(req , res) => {
+router.route('/tasks/add').post((req , res) => {
     //Build a new task with the data from the body 
     const token = req.header('auth-token');
     Token.find({token: token}).exec()
@@ -100,7 +116,9 @@ router.route('/tasks/add').post(verify,(req , res) => {
             task: req.body.task,
             complete: req.body.complete,
             taskOwnerId: result[0].userId,
-            url: req.body.url
+            url: req.body.url,
+            createdTime: req.body.createdTime,
+            updatedTime: req.body.updatedTime
         }
         let task = new Task(temp);
         task.save().then(task => {
@@ -121,7 +139,8 @@ router.route('/tasks/update/:id').post((req , res) => {
     var updatedTask = {
         _id: req.body._id,
         task: req.body.task,
-        complete: req.body.complete
+        complete: req.body.complete,
+        updatedTime: req.body.updatedTime
     }
     Task.updateOne({_id: req.body._id}, {$set: updatedTask} ,(err , task) => {
         if(err){
@@ -171,7 +190,8 @@ router.post('/signup' , (req , res) => {
                 else{
                     const user = new User({
                         email: req.body.email,
-                        password: hash
+                        password: hash,
+                        color: req.body.color
                     });
                     user
                     .save()
@@ -201,7 +221,7 @@ router.post("/signin" , (req,res) => {
     .then(user => {
         //Email is not found in our database
         if(user.length < 1){
-            return res.status(401).json({msg: 'User exists'});
+            return res.status(401).json({msg: 'User dosnt exists'});
         }
         else{
             bcrypt.compare(req.body.password , user[0].password, (err , result) => {
@@ -214,7 +234,9 @@ router.post("/signin" , (req,res) => {
                     res.status(200).json({
                         email: req.body.email,
                         token: token,
+                        color: result.color,
                         _id: user[0]._id});
+                    console.log(req.session.userId)
                 }
                 else{
                     res.status(401).json({msg: 'Auth failed'});
@@ -248,27 +270,66 @@ router.post("/token" , (req , res) => {
     
 })
 
-app.use('/' , router);
-app.get('/',(req , res) => {
-    res.status(200).send({msg: 'Hello World!'});
-});
-app.listen(4100 , () => console.log('Express server running on port 4100'));
+router.post("/color" , (req , res) => {
+    User.updateOne({_id: req.body.userId} , {$set: {color:req.body.color}} , (err , user) => {
+        if(err){
+            res.status(401).json({msg: err});
+        }
+        //Return the task as Json
+        else{
+            res.status(200).json({msg: user});
+        }
+    } )
+})
 
-function verify(req , res , next){
-    try{
-        const token = req.header('auth-token');
-        if(!token){
-            res.status(400).json({msg: 'no token'});;
+router.post("/font" , (req , res) => {
+    User.updateOne({_id: req.body.userId} , {$set: {font:req.body.font}} , (err , user) => {
+        if(err){
+            res.status(401).json({msg: err});
+        }
+        //Return the task as Json
+        else{
+            res.status(200).json({msg: user});
+        }
+    } )
+})
+
+router.post("/userByToken" , (req , res) => {
+    Token.find({token : req.body.token}).exec()
+    .then((result) => {
+        if(result.length < 1){
+            res.status(400).json({msg: "token dosn't exist"})
         }
         else{
-            const decoded = jwt.verify(token, 'server');
-            req.useData = decoded;
-            next();
+            User.find({_id: result[0].userId}).exec()
+            .then((user) => {
+                res.status(200).json(user)
+            }).catch(err => {
+                res.status(400).json({msg: err})
+            })
         }
-    }catch(error){
-        return res.status(401).json({
-            msg: 'Ivalid token'
-        });
-    }
-}
+    }).catch(err => {
+        res.status(400).json({msg: err})
+    })
+})
+
+
+
+// function verify(req , res , next){
+//     try{
+//         const token = req.header('auth-token');
+//         if(!token){
+//             res.status(400).json({msg: 'no token'});;
+//         }
+//         else{
+//             const decoded = jwt.verify(token, 'server');
+//             req.useData = decoded;
+//             next();
+//         }
+//     }catch(error){
+//         return res.status(401).json({
+//             msg: 'Ivalid token'
+//         });
+//     }
+// }
 

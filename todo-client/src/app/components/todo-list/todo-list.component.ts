@@ -1,4 +1,4 @@
-import { Component, OnInit , Input} from '@angular/core';
+import { Component, OnInit , Input, ViewChild} from '@angular/core';
 import { TaskService } from '../../task.service';
 import { Task } from '../../task.model'
 import { Router } from '@angular/router';
@@ -6,7 +6,8 @@ import { CookieService } from 'ngx-cookie-service';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl, Validators} from '@angular/forms';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { UserService } from 'src/app/user.service';
+import {MatSort} from '@angular/material/sort';
 
 
 @Component({
@@ -15,6 +16,10 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
   styleUrls: ['./todo-list.component.css']
 })
 export class TodoListComponent implements OnInit {
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  color = 'red'
+  fontFamily = 'Sans-serif'
+  userColor = 'primary';
   getYouTubeID = require('get-youtube-id');
   todos: Task[]; //Task's to do
   donedos: Task[];//Task's that are done
@@ -39,7 +44,7 @@ export class TodoListComponent implements OnInit {
     Validators.required,
     Validators.email,
   ]);
-  constructor(private taskService: TaskService , private router:Router, private cookieService: CookieService ){}
+  constructor(private taskService: TaskService , private router:Router, private cookieService: CookieService  , private userService: UserService ){}
   //Invoked when the website is launched
   //Initialize our fields and bring tasks from database
   //Insert in todos the tasks to do
@@ -50,7 +55,9 @@ export class TodoListComponent implements OnInit {
       this.donedos = []; 
       this.updateDonedosFromDataBase();
       this.updateTodoFromDataBase();
-      this.changeToNormal();
+      this.userService.getUserByToken(this.cookieService.get("token")).subscribe((res) =>{
+        this.changeColorAndFont(res[0].color , res[0].font)
+      })
     }
     else{
       this.router.navigate(['/signin']);
@@ -68,6 +75,7 @@ export class TodoListComponent implements OnInit {
     this.taskService.getTasksToDo().subscribe((tasks : Task[]) => {
       this.todos = tasks;
       this.todoDataSource = new MatTableDataSource<Task>(this.todos);
+      this.todoDataSource.sort = this.sort;
     })
   }
 
@@ -95,9 +103,10 @@ export class TodoListComponent implements OnInit {
     }
     this.urlInput = '';
     this.value = '';
+    var time = new Date();
     //Add a new task to the database calling api functions
-    this.taskService.addTask(task , false , url).subscribe((_id:string) => {
-      const taskToPush = new Task(_id , task , false , url);
+    this.taskService.addTask(task , false , url , time).subscribe((_id:string) => {
+      const taskToPush = new Task(_id , task , false , url , time , time);
       this.todos.push(taskToPush);
       this.todoDataSource.data = this.todos;
     });
@@ -128,10 +137,11 @@ export class TodoListComponent implements OnInit {
   
   //Update the complete field to true then Update the database
   moveToDone(task){
+    var time = new Date();
     //Find the task in our todos
     for(let taskToChange of this.todos){
       if(task._id == taskToChange._id){
-        this.taskService.updateTask(task._id , task.task, true).subscribe(() => {
+        this.taskService.updateTask(task._id , task.task, true , time).subscribe(() => {
           //Update todos and donedos
           this.todos = this.todos.filter(taskToDelete => taskToDelete!= task);
           taskToChange.complete = true;
@@ -155,10 +165,11 @@ export class TodoListComponent implements OnInit {
 
   //Update the complete field to false then Update the database
   moveToUndone(task){
+    var time = new Date();
     //Find the task in our donedos
     for(let taskToChange of this.donedos){
       if(task._id == taskToChange._id){
-        this.taskService.updateTask(task._id , task.task, false).subscribe(() => {
+        this.taskService.updateTask(task._id , task.task, false , time).subscribe(() => {
           //Update todos and donedos
           this.donedos = this.donedos.filter(taskToDelete => taskToDelete!= task);
           taskToChange.complete = false;
@@ -172,14 +183,16 @@ export class TodoListComponent implements OnInit {
 
   //Update a task that is not done yet in our database
   updateField(task){
+    var time = new Date();
     //Find the task in our todos
     for(let taskToChange of this.todos){
       if(task._id == taskToChange._id){
-        this.taskService.updateTask(task._id , task.task, task.complete).subscribe(() => {
+        this.taskService.updateTask(task._id , task.task, task.complete , time).subscribe(() => {
           //Update todos and donedos
           taskToChange._id = task._id;
           taskToChange.task = task.task;
           taskToChange.complete = task.complete;
+          taskToChange.updatedTime = time;
           this.todoDataSource.data = this.todos;
         })
       }
@@ -299,54 +312,18 @@ export class TodoListComponent implements OnInit {
     this.youtubeId = '';
     this.player.stopVideo();
   }
-
+  //Save youtube player
   savePlayer(player) {
     this.player = player;
   }
-
-  changeToGreen(){
-    document.getElementsByName('changeColor').forEach((obj) => {
-      obj.style.color = 'lightgreen';
-      obj.style.fontFamily = 'Serif'
-    }) 
-    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
-      obj.style.backgroundColor = 'lightgreen';
-      obj.style.fontFamily = 'Serif'
-    })
+  //Change the color and font and save in database
+  changeColorAndFont(color , font){
+    this.color = color;
+    this.fontFamily = font;
+    this.userService.updateColor(color, this.cookieService.get('token'));
+    this.userService.updateFont(font , this.cookieService.get('token'));
   }
-
-  changeToYellow(){
-    document.getElementsByName('changeColor').forEach((obj) => {
-      obj.style.color = 'yellow';
-      obj.style.fontFamily = 'Georgia'
-    }) 
-    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
-      obj.style.backgroundColor = 'yellow';
-      obj.style.fontFamily = 'Georgia'
-    })
-  }
-
-  changeToRed(){
-    document.getElementsByName('changeColor').forEach((obj) => {
-      obj.style.color = 'red';
-      obj.style.fontFamily = 'cursive'
-    }) 
-    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
-      obj.style.backgroundColor = 'red';
-      obj.style.fontFamily = 'cursive'
-    })
-  }
-
-  changeToNormal(){
-    document.getElementsByName('changeColor').forEach((obj) => {
-      obj.style.color = '#3F51B5';
-      obj.style.fontFamily = 'Sans-serif'
-    }) 
-    document.getElementsByName('changeBackgroundColor').forEach((obj) => {
-      obj.style.backgroundColor = '#3F51B5';
-      obj.style.fontFamily = 'Sans-serif'
-    })
-  }
+ 
 
   
   

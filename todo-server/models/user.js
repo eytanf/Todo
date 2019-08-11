@@ -10,6 +10,12 @@ let User = new Schema({
     },
     password: {
         type: String , required: true
+    },
+    color: {
+        type: String
+    },
+    font: {
+        type: String
     }
 });
 

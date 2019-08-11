@@ -8,15 +8,18 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
+  currentUser = '';
+
   uri = 'http://localhost:4100';
 
   constructor(private http: HttpClient) { }
 
   //Create a new user and save it in our database by sending to the server
-  addUser(email , password){
+  addUser(email , password , color){
     const userToAdd = {
       email: email,
-      password: password
+      password: password,
+      color: color
     }
     return this.http.post(`${this.uri}/signup`,userToAdd);
   }
@@ -28,6 +31,7 @@ export class UserService {
       email: email,
       password: password
     }
+    this.currentUser = email;
     return this.http.post<User>(`${this.uri}/signin`,userToValid);
   }
 
@@ -37,8 +41,36 @@ export class UserService {
       token: token,
       userId: _id
     }
-    
     this.http.post(`${this.uri}/token`,tokenToStore).subscribe((res:any) => {
     });
+  }
+
+  //Get the user data by token
+  getUserByToken(token){
+    const tokenToSend = {
+      token: token
+    }
+    return this.http.post(`${this.uri}/userByToken`, tokenToSend);
+  }
+
+  //Save the color choice from the user
+  updateColor(color , token){
+    this.getUserByToken(token).subscribe((res : any) => {
+      const userColor = {
+        userId: res[0]._id,
+        color: color
+      };
+      this.http.post(`${this.uri}/color`, userColor).subscribe((res:any) => {});
+    })
+  }
+  //Save the font choice from the user
+  updateFont(font , token){
+    this.getUserByToken(token).subscribe((res : any) => {
+      const userFont = {
+        userId: res[0]._id,
+        font: font
+      };
+      this.http.post(`${this.uri}/font`, userFont).subscribe((res:any) => {});
+    })
   }
 }

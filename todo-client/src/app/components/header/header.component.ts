@@ -22,6 +22,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher  {
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+  userColor = 'primary';
   registerForm: FormGroup;
   loginForm: FormGroup;
   logInput: string = "";
@@ -67,6 +68,7 @@ export class HeaderComponent implements OnInit {
       this.userService.registerToken(res.token , res._id);
       this.cookieService.set("token",res.token);
       this.userName = res.email;
+      this.userColor = res.color;
       document.getElementById('signInModal').style.display='none';
       this.ngOnInit();
       
@@ -127,7 +129,7 @@ export class HeaderComponent implements OnInit {
   register(email , password , checkPassword){
     this.isClicked = true;
     if(password.length > 0 && password === checkPassword && this.validateEmailReg()){
-      this.userService.addUser(email , password).subscribe(() => {
+      this.userService.addUser(email , password , this.userColor).subscribe(() => {
         this.login(email , password);
         document.getElementById('signUpModal').style.display='none';
       },(error) => {

@@ -35,11 +35,13 @@ export class TaskService {
   }
 
   //Add a new task to our database and returns it
-  addTask(task , complete , youtubeUrl){
+  addTask(task , complete , youtubeUrl , time){
     const taskToAdd = {
       task: task,
       complete: complete,
-      url: youtubeUrl
+      url: youtubeUrl,
+      createdTime: time,
+      updatedTime: time
     }
     return this.http.post(`${this.uri}/tasks/add`,taskToAdd , {
       headers: {
@@ -49,11 +51,12 @@ export class TaskService {
   }
 
   //Update a Task from the server if its exists
-  updateTask(_id , task , complete){
+  updateTask(_id , task , complete , time){
     const taskToUpdate = {
       _id: _id,
       task: task,
-      complete: complete
+      complete: complete,
+      updatedTime: time
     }
     return this.http.post(`${this.uri}/tasks/update/${_id}`,taskToUpdate, {
       headers: {

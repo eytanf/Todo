@@ -16,6 +16,12 @@ let Task = new Schema({
     },
     url: {
         type: String
+    },
+    createdTime: {
+        type: Date
+    },
+    updatedTime: {
+        type: Date
     }
 });
 

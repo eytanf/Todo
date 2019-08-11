@@ -1,11 +1,11 @@
 
 <div class="header" style="text-align: right" >
-    <mat-toolbar name="changeBackgroundColor" color="primary">
+    <mat-toolbar [ngStyle]="{'background-color': color , 'font-family' : fontFamily}" color="primary">
         <img src="../../../assets/edit (1).png">
         <span class="a-bit-right"></span>
         Welcome to Todo app!
         <span class="toolbar-spacer"></span>
-        <button mat-button name="changeBackgroundColor" class="signoutBtn" (click)="logout()">
+        <button mat-button [ngStyle]="{'background-color': color , 'font-family' : fontFamily}" class="signoutBtn" (click)="logout()">
             <b>LogOut</b>
         </button>
     </mat-toolbar>
@@ -13,20 +13,20 @@
 <!--Font buttons-->
 <div class="fontChanger" fxLayout="row" fxLayout.xs="columns" fxLayoutWrap fxLayoutGap="0.5%" fxLayoutAlign="center" >
     <div fxFlex="100%">
-        <button class="green" mat-mini-fab matTooltip="click to change the font to green" (click)="changeToGreen()"></button>
+        <button class="green" mat-mini-fab matTooltip="click to change the font to green" (click)="changeColorAndFont('lightgreen' , 'Serif')"></button>
     </div>
     <div fxFlex="100%">
-        <button class="yellow" mat-mini-fab matTooltip="click to change the font to yellow" (click)="changeToYellow()"></button>
+        <button class="yellow" mat-mini-fab matTooltip="click to change the font to yellow" (click)="changeColorAndFont('yellow' , 'Georgia')"></button>
     </div>
     <div fxFlex="100%">
-        <button class="red" mat-mini-fab matTooltip="click to change the font to red" (click)="changeToRed()"></button>
+        <button class="red" mat-mini-fab matTooltip="click to change the font to red" (click)="changeColorAndFont('red' , 'cursive')"></button>
     </div>
     <div fxFlex="100%">
-        <button mat-mini-fab matTooltip="click to change the font back to normal" color="primary" (click)="changeToNormal()"></button>
+        <button mat-mini-fab matTooltip="click to change the font back to normal" color="primary" (click)="changeColorAndFont('#3F51B5' , 'Sans-serif')"></button>
     </div>
 </div>
 
-<h1 class="title" name="changeColor">Insert a task to begin!</h1>
+<h1 class="title" [ngStyle]="{'color': color , 'font-family' : fontFamily}">Insert a task to begin!</h1>
 
 <!--Input to insert new tasks to do-->
 <mat-form-field class="tasks-input" color="primary">
@@ -64,7 +64,7 @@
 mat-button color="primary"
 mat-raised-button matTooltip="click to insert a new task" 
 class="button" 
-name="changeBackgroundColor" 
+[ngStyle]="{'background-color': color , 'font-family' : fontFamily}"
 (click)="add(task.value , url.value)">
     Submit
 </button>
@@ -81,11 +81,11 @@ name="changeBackgroundColor"
 <br>
 <div class="button-group">
 <!--Visual table with the tasks from todo-->
-<table mat-table [dataSource]="todoDataSource" class="mat-elevation-z8">
+<table mat-table [dataSource]="todoDataSource" matSort class="mat-elevation-z8">
 
   <!-- Checkbox Column -->
   <ng-container matColumnDef="select">
-      <th mat-header-cell *matHeaderCellDef>
+      <th mat-header-cell *matHeaderCellDef >
       <mat-checkbox (change)="$event ? masterToggleTodo() : null"
                     [checked]="todoSelection.hasValue() && isAllSelectedTodo()"
                     [indeterminate]="todoSelection.hasValue() && !isAllSelectedTodo()"
@@ -104,7 +104,7 @@ name="changeBackgroundColor"
 
   <!-- Tasks Column -->
   <ng-container matColumnDef="task">
-    <th mat-header-cell *matHeaderCellDef class="taskColumnClass"> Tasks </th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="taskColumnClass" matSort> Tasks </th>
     <td mat-cell *matCellDef="let element"> 
         <mat-form-field class="taskInputClass">
             <input 
@@ -120,7 +120,7 @@ name="changeBackgroundColor"
 
   <!--Done Button-->
   <ng-container matColumnDef="done">
-    <th mat-header-cell *matHeaderCellDef></th>
+    <th mat-header-cell *matHeaderCellDef ></th>
     <td mat-cell *matCellDef="let element"> 
         <button mat-icon-button matTooltip="click to move task to done list" color="primary" (click)="moveToDone(element)">
             <mat-icon>check_circle_outline</mat-icon>
@@ -197,7 +197,7 @@ name="changeBackgroundColor"
     
     <!-- Tasks Column -->
     <ng-container matColumnDef="task">
-        <th mat-header-cell *matHeaderCellDef> Done Tasks </th>
+        <th mat-header-cell *matHeaderCellDef class="taskColumnClass"> Done Tasks </th>
         <td class="disabled" mat-cell *matCellDef="let element"> 
             {{element.task}}
         </td>
