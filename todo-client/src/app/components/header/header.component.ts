@@ -69,7 +69,6 @@ export class HeaderComponent implements OnInit {
       this.cookieService.set("token",res.token);
       this.userName = res.email;
       this.userColor = res.color;
-      document.getElementById('signInModal').style.display='none';
       this.ngOnInit();
       
     },error => this.isUserValid = false);
@@ -131,7 +130,6 @@ export class HeaderComponent implements OnInit {
     if(password.length > 0 && password === checkPassword && this.validateEmailReg()){
       this.userService.addUser(email , password , this.userColor).subscribe(() => {
         this.login(email , password);
-        document.getElementById('signUpModal').style.display='none';
       },(error) => {
         if(error.status == 409){
           this.isUserExist = true;

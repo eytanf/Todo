@@ -73,15 +73,36 @@ class="button"
 <br>
 <div class="button-group">
     <!--Move all ,button disabled if nothing is selected-->
-    <button mat-button color="primary" matTooltip="click to move selected tasks to done" [disabled]="!todoSelection.hasValue()" (click)="moveToDoneSelectedTodo()">Done</button>
+    <button 
+    mat-button color="primary" 
+    matTooltip="click to move selected tasks to done" 
+    [disabled]="!todoSelection.hasValue()" 
+    (click)="moveToDoneSelectedTodo()">Done</button>
     <!--Delete all ,button disabled if nothing is selected-->
-    <button mat-button color="primary" matTooltip="click to delete selected tasks" [disabled]="!todoSelection.hasValue()" (click)="deleteSelectedTodo()">Delete</button>
+    <button
+     mat-button 
+     color="primary" 
+     matTooltip="click to delete selected tasks" 
+     [disabled]="!todoSelection.hasValue()" 
+     (click)="deleteSelectedTodo()">Delete</button>
+     <!--Sort by created order-->
+     <button
+     mat-button 
+     [ngStyle]="{'color': color , 'font-family' : fontFamily}"
+     matTooltip="click to sort by created order" 
+     (click)="sortDateTodo()">CreatedOrder</button>
+     <!--Sort by updated time-->
+     <button
+     mat-button 
+     [ngStyle]="{'color': color , 'font-family' : fontFamily}"
+     matTooltip="click to sort by created order" 
+     (click)="sortUpdateTodo()">UpdatedOrder</button>
 </div>
 <br>
 <br>
 <div class="button-group">
 <!--Visual table with the tasks from todo-->
-<table mat-table [dataSource]="todoDataSource" matSort class="mat-elevation-z8">
+<table mat-table #sortUndone='matSort' [dataSource]="todoDataSource" matSort class="mat-elevation-z8">
 
   <!-- Checkbox Column -->
   <ng-container matColumnDef="select">
@@ -104,7 +125,7 @@ class="button"
 
   <!-- Tasks Column -->
   <ng-container matColumnDef="task">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header class="taskColumnClass" matSort> Tasks </th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header class="taskColumnClass" > Tasks </th>
     <td mat-cell *matCellDef="let element"> 
         <mat-form-field class="taskInputClass">
             <input 
@@ -150,7 +171,10 @@ class="button"
 
   <!--Youtube url button-->
   <ng-container matColumnDef="youtube">
-    <th mat-header-cell *matHeaderCellDef></th>
+    <th mat-header-cell *matHeaderCellDef><button
+        mat-button  
+        matTooltip="click to show/hide tasks without youtube url" 
+        (click)="filterTasks()">Youtube</button></th>
     <td mat-cell *matCellDef="let element"> 
         <button 
         mat-icon-button 
@@ -172,13 +196,25 @@ class="button"
 <button mat-button color="primary" matTooltip="click to move selected tasks to tasks" [disabled]="!donedoSelection.hasValue()" (click)="moveToToDoSelectedTodo()">UnDone</button>
 <!--Delete all button disabled if nothing is selected-->
 <button mat-button color="primary" matTooltip="click to delete selected tasks" [disabled]="!donedoSelection.hasValue()" (click)="deleteSelectedDonedo()">Delete</button>
+<!--Sort by created order-->
+<button
+mat-button 
+[ngStyle]="{'color': color , 'font-family' : fontFamily}"
+matTooltip="click to sort by created order" 
+(click)="sortDateDonedo()">CreatedOrder</button>
+<!--Sort by updated time-->
+<button
+mat-button 
+[ngStyle]="{'color': color , 'font-family' : fontFamily}"
+matTooltip="click to sort by created order" 
+(click)="sortUpdateDonedo()">UpdatedOrder</button>
+<!--Done Table-->
 <br>
- <!--Done Table-->
-<table mat-table [dataSource]="donedoDataSource" class="mat-elevation-z8">
+<table #sortDone="matSort" mat-table [dataSource]="donedoDataSource" matSort="sortDone" class="mat-elevation-z8">
 
     <!-- Checkbox Column -->
     <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef >
         <mat-checkbox (change)="$event ? masterToggleDonedo() : null"
                         [checked]="donedoSelection.hasValue() && isAllSelectedDonedo()"
                         [indeterminate]="donedoSelection.hasValue() && !isAllSelectedDonedo()"
@@ -197,7 +233,7 @@ class="button"
     
     <!-- Tasks Column -->
     <ng-container matColumnDef="task">
-        <th mat-header-cell *matHeaderCellDef class="taskColumnClass"> Done Tasks </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="taskColumnClass"> Done Tasks </th>
         <td class="disabled" mat-cell *matCellDef="let element"> 
             {{element.task}}
         </td>
@@ -205,7 +241,7 @@ class="button"
     
     <!--Undone Button-->
     <ng-container matColumnDef="done">
-        <th mat-header-cell *matHeaderCellDef></th>
+        <th mat-header-cell *matHeaderCellDef ></th>
         <td mat-cell *matCellDef="let element"> 
             <button mat-icon-button matTooltip="click to move to Tasks" color="primary" (click)="moveToUndone(element)">
                 <mat-icon>remove</mat-icon>
@@ -215,7 +251,7 @@ class="button"
     
     <!--Remove Button-->
     <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef></th>
+        <th mat-header-cell *matHeaderCellDef ></th>
         <td mat-cell *matCellDef="let element"> 
             <button mat-icon-button matTooltip="click to delete task" color="warn" (click)="removeFromDone(element)">
                 <mat-icon>highlight_off</mat-icon>
@@ -225,7 +261,10 @@ class="button"
 
     <!--Youtube url button-->
     <ng-container matColumnDef="youtube">
-        <th mat-header-cell *matHeaderCellDef></th>
+        <th mat-header-cell *matHeaderCellDef ><button
+            mat-button  
+            matTooltip="click to show/hide tasks without youtube url" 
+            (click)="filterDoneTasks()">Youtube</button></th>
         <td mat-cell *matCellDef="let element"> 
             <button 
             mat-icon-button 

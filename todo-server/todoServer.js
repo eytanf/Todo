@@ -236,7 +236,6 @@ router.post("/signin" , (req,res) => {
                         token: token,
                         color: result.color,
                         _id: user[0]._id});
-                    console.log(req.session.userId)
                 }
                 else{
                     res.status(401).json({msg: 'Auth failed'});

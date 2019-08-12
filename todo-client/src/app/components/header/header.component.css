@@ -95,66 +95,36 @@ form {
     left: 5px;
   }
 
-  /* @media screen and (max-width: 992px) {
-    .modal-content {
-      width: 160px; 
-      height: 260px;
-      overflow: hidden;
-      font-size: 12px;
+   @media screen and (max-width: 992px) {
+     .container{
+       width: 100%
+     }
+
+     .modal-content{
+       width: 60%;
+     }
+     
+     .modal-content-Signin{
+      width: 60%;
     }
-    .modal-content-Signin {
-      width: 160px; 
-      height: 150px;
-      overflow: hidden;
-      font-size: 12px;
-    }
-    mat-form-field{
-      width: 75%;
-      height: 20%;
-    }
-    .container{
-      padding: 7px;
-    }
-    .modalBtnIn , .modalBtnOut{
-      font-size: 15px;
-      padding: 5px;
-      float: none;
-    }
-    .error{
-      font-size: 8px;
-    }
-  .mat-input-placeholder{
-      font-size: 50px;
-    }
-  }
+   }
+    
   
 
 @media screen and (max-width: 700px) {
-   .modal-content {
-    width: 130px; 
-    height: 200px;
-    overflow: hidden;
-    font-size: 10px;
-  }
-  .modal-content-Signin {
-    width: 300px; 
-    height: 160px;
-    overflow: hidden;
-    font-size: 15px;
-  }
-  mat-form-field{
-    width: 90%;
-    height: 20%;
-    padding-left: 5px;
-  }
+   
   .container{
-    width: 100%;
+    width: 100%
   }
-  .error{
-    font-size: 10px;
-  } 
-  
-} */
+
+  .modal-content{
+    width: 95%;
+  }
+
+  .modal-content-Signin{
+    width: 95%;
+  }
+} 
 
 
   

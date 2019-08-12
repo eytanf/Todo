@@ -8,6 +8,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl, Validators} from '@angular/forms';
 import { UserService } from 'src/app/user.service';
 import {MatSort} from '@angular/material/sort';
+import { MatPaginator } from '@angular/material';
 
 
 @Component({
@@ -16,34 +17,40 @@ import {MatSort} from '@angular/material/sort';
   styleUrls: ['./todo-list.component.css']
 })
 export class TodoListComponent implements OnInit {
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  //Sorting vars for the tables
+  @ViewChild(MatPaginator, {static: true}) paginatorUndone: MatPaginator;
+  @ViewChild('sortUndone', {static: true}) sortUndone: MatSort;
+  @ViewChild(MatPaginator, {static: true}) paginatorDone: MatPaginator;
+  @ViewChild('sortDone', {static: true}) sortDone: MatSort;
+  todoSortDate: boolean = false; //boolean to sort by date
+  donedoSortDate: boolean = false; //boolean to sort by date
+  todoSortUpdate: boolean = false; //boolean to sort by updated
+  doneSortUpdate: boolean = false; //boolean to sort by updated
+  //Youtube vars
+  getYouTubeID = require('get-youtube-id');
+  showUrl: boolean = false; // true when modal pop out
+  youtubeId = '';
+  player: YT.Player;
+  //Youtube boolean filter
+  showAll: boolean = true;
+  showAllDone: boolean = true;
+  //Style vars
   color = 'red'
   fontFamily = 'Sans-serif'
-  userColor = 'primary';
-  getYouTubeID = require('get-youtube-id');
+  //Tasks data
   todos: Task[]; //Task's to do
   donedos: Task[];//Task's that are done
-  value: string = '';//Input field string
-  youtubeUrl: string ='';
   todoDisplayedColumns: string[] = ['select', 'task' ,'done' , 'delete' , 'update' , 'youtube'];
   todoDataSource;
   todoSelection = new SelectionModel<Task>(true, []);
   donedoDisplayedColumns: string[] = ['select', 'task' ,'done' , 'delete' , 'youtube'];
   donedoDataSource;
   donedoSelection = new SelectionModel<Task>(true, []);
-  emptyTask: boolean = false;
-  showUrl: boolean = false;
+  //Task and Url input and validators
+  value: string = '';//Input field string
   urlInput = '';
-  playerVars = {
-    cc_lang_pref: 'en'
-  };
-  youtubeId = '';
-  player: YT.Player;
-
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email,
-  ]);
+  emptyTask: boolean = false; // raise error if false and try to insert a task
+  
   constructor(private taskService: TaskService , private router:Router, private cookieService: CookieService  , private userService: UserService ){}
   //Invoked when the website is launched
   //Initialize our fields and bring tasks from database
@@ -75,7 +82,8 @@ export class TodoListComponent implements OnInit {
     this.taskService.getTasksToDo().subscribe((tasks : Task[]) => {
       this.todos = tasks;
       this.todoDataSource = new MatTableDataSource<Task>(this.todos);
-      this.todoDataSource.sort = this.sort;
+      this.todoDataSource.sort = this.sortUndone;
+      this.todoDataSource.paginator = this.paginatorUndone;     
     })
   }
 
@@ -84,9 +92,11 @@ export class TodoListComponent implements OnInit {
     this.taskService.getDoneTasks().subscribe((task: Task[]) => {
       this.donedos = task;
       this.donedoDataSource = new MatTableDataSource<Task>(this.donedos);
+      this.donedoDataSource.sort = this.sortDone;
+      this.donedoDataSource.paginator = this.paginatorDone;
     });
   }
-  
+  //Reset the empty task error
   resetEmptyTask(){
     this.emptyTask = false;
   }
@@ -110,6 +120,7 @@ export class TodoListComponent implements OnInit {
       this.todos.push(taskToPush);
       this.todoDataSource.data = this.todos;
     });
+    
   }
 
   //Remove the task given an id and update todo and donedos
@@ -209,7 +220,13 @@ export class TodoListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelectedTodo() {
     const numSelected = this.todoSelection.selected.length;
-    const numRows = this.todos.length;
+    var numRows;
+    if(this.todoDataSource != null){
+      numRows = this.todoDataSource.data.length;
+    }
+    else{
+      numRows = this.todos.length;
+    }
     return numSelected === numRows;
   }
 
@@ -231,7 +248,12 @@ export class TodoListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelectedDonedo() {
     const numSelected = this.donedoSelection.selected.length;
-    const numRows = this.donedos.length;
+    var numRows;
+    if(this.donedoDataSource != null){
+      numRows = this.donedoDataSource.data.length;
+    }else{
+      numRows = this.donedos.length;
+    }
     return numSelected === numRows;
   }
 
@@ -323,9 +345,113 @@ export class TodoListComponent implements OnInit {
     this.userService.updateColor(color, this.cookieService.get('token'));
     this.userService.updateFont(font , this.cookieService.get('token'));
   }
- 
+ //Hide/Show tasks without youtube url
+  filterTasks(){
+    if(this.showAll){
+      this.showAll = false;
+      this.todoDataSource.data = this.todoDataSource.data.filter(task => task.url != '')
+    }
+    else{
+      this.showAll = true;
+      this.todoDataSource.data =  this.todos;
+    }
+  }
+  //Hide/Show done tasks without youtube url
+  filterDoneTasks(){
+    if(this.showAllDone){
+      this.showAllDone = false;
+      this.donedoDataSource.data = this.donedoDataSource.data.filter(task => task.url != '')
+    }
+    else{
+      this.showAllDone = true;
+      this.donedoDataSource.data =  this.donedos;
+    }
+  }
+  //Sort todo tasks by created time
+  sortDateTodo() {
+    let temp = this.todos;
+    this.clearSortTodo();
+    //Sort new to old
+    if(this.todoSortDate){
+      this.todoSortDate = !this.todoSortDate;
+      this.todoDataSource.data = temp.sort((a, b) => {
+        return new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime();
+      });
+    }else{
+      //Sort old to new
+      this.todoSortDate = !this.todoSortDate;
+      this.todoDataSource.data = temp.sort((a, b) => {
+        return new Date(a.createdTime).getTime() - new Date(b.createdTime).getTime();
+      });
+    }
+  }
+//Sort done tasks by created time
+  sortDateDonedo(){
+    let temp = this.donedos;
+    this.clearSortDone();
+    //Sort new to old
+    if(this.donedoSortDate){
+      this.donedoSortDate = !this.donedoSortDate;
+      this.donedoDataSource.data = temp.sort((a , b) => {
+        return new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime();
+      });
+    }else{
+      //Sort old to new
+      this.donedoSortDate = !this.donedoSortDate;
+      this.donedoDataSource.data = temp.sort((a , b) => {
+        return new Date(a.createdTime).getTime() - new Date(b.createdTime).getTime();
+      });
+    }
+  }
 
-  
+  //Reset the sorting from todo table
+  clearSortTodo() {
+    this.sortUndone.sort({id: '', start: 'asc', disableClear: false});
+  }
+
+  //Reset the sorting from done table
+  clearSortDone() {
+    this.sortDone.sort({id: '', start: 'asc', disableClear: false});
+  }
+
+  //Sort todo tasks by updated time
+  sortUpdateTodo() {
+    let temp = this.todos;
+    this.clearSortTodo();
+    //Sort new to old
+    if(this.todoSortUpdate){
+      this.todoSortUpdate = !this.todoSortUpdate;
+      this.todoDataSource.data = temp.sort((a, b) => {
+        return new Date(b.updatedTime).getTime() - new Date(a.updatedTime).getTime();
+      });
+    }else{
+      //Sort old to new
+      this.todoSortUpdate = !this.todoSortUpdate;
+      this.todoDataSource.data = temp.sort((a, b) => {
+        return new Date(a.updatedTime).getTime() - new Date(b.updatedTime).getTime();
+      });
+    }
+  }
+
+  //Sort done tasks by updated time
+  sortUpdateDonedo(){
+    let temp = this.donedos;
+    this.clearSortDone();
+    //Sort new to old
+    if(this.doneSortUpdate){
+      this.doneSortUpdate = !this.doneSortUpdate;
+      this.donedoDataSource.data = temp.sort((a , b) => {
+        return new Date(b.updatedTime).getTime() - new Date(a.updatedTime).getTime();
+      });
+    }else{
+      //Sort old to new
+      this.doneSortUpdate = !this.doneSortUpdate;
+      this.donedoDataSource.data = temp.sort((a , b) => {
+        return new Date(a.updatedTime).getTime() - new Date(b.updatedTime).getTime();
+      });
+    }
+  }
+
   
   
 
