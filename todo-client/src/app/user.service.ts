@@ -32,6 +32,10 @@ export class UserService {
    //check if the request is get
    else if(requestType === 'get'){
     return this.httpGetRequest(`${this.uri}/${endUrl}` ,element , hasHeader , byId).pipe(catchError((err) => {
+      //Auth error log the user out and send back to signin page
+      if(err.status === 401){
+        this.router.navigate(['/signin']);
+      }
       return err;
     }))
    }
