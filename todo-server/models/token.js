@@ -6,10 +6,10 @@ const Schema = mongoose.Schema;
 //_id (unique per person), token(unique) 
 let Token = new Schema({
     token: {
-        type: String , required: true , unique: true
+        type: String 
     },
     userId: {
-        type: String , required: true 
+        type: String 
     }
 });
 

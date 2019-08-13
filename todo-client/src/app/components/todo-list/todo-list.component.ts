@@ -9,6 +9,9 @@ import {FormControl, Validators} from '@angular/forms';
 import { UserService } from 'src/app/user.service';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material';
+import { Observable } from 'rxjs';
+import { throwError } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
 
 
 @Component({
@@ -35,7 +38,7 @@ export class TodoListComponent implements OnInit {
   showAll: boolean = true;
   showAllDone: boolean = true;
   //Style vars
-  color = 'red'
+  color = '#3F51B5'
   fontFamily = 'Sans-serif'
   //Tasks data
   todos: Task[]; //Task's to do
@@ -62,7 +65,11 @@ export class TodoListComponent implements OnInit {
       this.donedos = []; 
       this.updateDonedosFromDataBase();
       this.updateTodoFromDataBase();
-      this.userService.getUserByToken(this.cookieService.get("token")).subscribe((res) =>{
+      const tokenToSend = {
+        token: this.cookieService.get("token")
+      }
+      this.userService.generalApi('userByToken',tokenToSend , true , 'post' , null).subscribe(
+        (res) =>{
         this.changeColorAndFont(res[0].color , res[0].font)
       })
     }
@@ -79,7 +86,8 @@ export class TodoListComponent implements OnInit {
 
   //Bring from the database the Tasks to do to todos
   updateTodoFromDataBase(){
-    this.taskService.getTasksToDo().subscribe((tasks : Task[]) => {
+    this.userService.generalApi('tasks' , null , true , 'get' , null).subscribe(
+      (tasks : Task[]) => {
       this.todos = tasks;
       this.todoDataSource = new MatTableDataSource<Task>(this.todos);
       this.todoDataSource.sort = this.sortUndone;
@@ -89,7 +97,8 @@ export class TodoListComponent implements OnInit {
 
   //Bring from the database the Tasks that are done to donedos
   updateDonedosFromDataBase(){
-    this.taskService.getDoneTasks().subscribe((task: Task[]) => {
+    this.userService.generalApi('tasksDone' , null , true , 'get' , null).subscribe(
+      (task: Task[]) => {
       this.donedos = task;
       this.donedoDataSource = new MatTableDataSource<Task>(this.donedos);
       this.donedoDataSource.sort = this.sortDone;
@@ -114,8 +123,16 @@ export class TodoListComponent implements OnInit {
     this.urlInput = '';
     this.value = '';
     var time = new Date();
+    const taskToAdd = {
+      task: task,
+      complete: false,
+      url: url,
+      createdTime: time,
+      updatedTime: time
+    }
     //Add a new task to the database calling api functions
-    this.taskService.addTask(task , false , url , time).subscribe((_id:string) => {
+    this.userService.generalApi('tasks/add' , taskToAdd , true , 'post' , null).subscribe(
+      (_id:string) => {
       const taskToPush = new Task(_id , task , false , url , time , time);
       this.todos.push(taskToPush);
       this.todoDataSource.data = this.todos;
@@ -125,7 +142,7 @@ export class TodoListComponent implements OnInit {
 
   //Remove the task given an id and update todo and donedos
   remove(task){
-    this.taskService.deleteTask(task._id).subscribe(() => {
+    this.userService.generalApi('tasks/delete' , null , true , 'post' , task._id).subscribe(() => {
       if(task.complete == true){
         this.donedos = this.donedos.filter(taskToDelete => taskToDelete!= task);
         this.donedoDataSource.data = this.donedos;
@@ -152,7 +169,13 @@ export class TodoListComponent implements OnInit {
     //Find the task in our todos
     for(let taskToChange of this.todos){
       if(task._id == taskToChange._id){
-        this.taskService.updateTask(task._id , task.task, true , time).subscribe(() => {
+        const taskToUpdate = {
+          _id: task._id,
+          task: task.task,
+          complete: true,
+          updatedTime: time
+        }
+        this.userService.generalApi('tasks/update' , taskToUpdate, true , 'post' , task.id).subscribe(() => {
           //Update todos and donedos
           this.todos = this.todos.filter(taskToDelete => taskToDelete!= task);
           taskToChange.complete = true;
@@ -180,7 +203,13 @@ export class TodoListComponent implements OnInit {
     //Find the task in our donedos
     for(let taskToChange of this.donedos){
       if(task._id == taskToChange._id){
-        this.taskService.updateTask(task._id , task.task, false , time).subscribe(() => {
+        const taskToUpdate = {
+          _id: task._id,
+          task: task.task,
+          complete: false,
+          updatedTime: time
+        }
+        this.userService.generalApi('tasks/update' , taskToUpdate, true , 'post' , task._id).subscribe(() => {
           //Update todos and donedos
           this.donedos = this.donedos.filter(taskToDelete => taskToDelete!= task);
           taskToChange.complete = false;
@@ -198,7 +227,13 @@ export class TodoListComponent implements OnInit {
     //Find the task in our todos
     for(let taskToChange of this.todos){
       if(task._id == taskToChange._id){
-        this.taskService.updateTask(task._id , task.task, task.complete , time).subscribe(() => {
+        const taskToUpdate = {
+          _id: task._id,
+          task: task.task,
+          complete: task.complete,
+          updatedTime: time
+        }
+        this.userService.generalApi('tasks/update' , taskToUpdate, true , 'post' , task._id).subscribe(() => {
           //Update todos and donedos
           taskToChange._id = task._id;
           taskToChange.task = task.task;
@@ -214,7 +249,7 @@ export class TodoListComponent implements OnInit {
     this.todos = [];
     this.donedos = [];
     this.cookieService.delete("token");
-    this.ngOnInit();
+    this.router.navigate(['/signin'])
     }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -342,8 +377,33 @@ export class TodoListComponent implements OnInit {
   changeColorAndFont(color , font){
     this.color = color;
     this.fontFamily = font;
-    this.userService.updateColor(color, this.cookieService.get('token'));
-    this.userService.updateFont(font , this.cookieService.get('token'));
+    const tokenToSend = {
+      token: this.cookieService.get('token')
+    }
+    this.userService.generalApi('userByToken' , tokenToSend , true , 'post' , null).pipe(
+      flatMap((res) => {
+        const userColor = {
+          userId: res[0]._id,
+          color: color
+        };
+        return this.userService.generalApi('color' , userColor , true , 'post' , null)
+      })
+    ).subscribe(
+      (res) =>{}
+    )
+
+    //Font api
+    this.userService.generalApi('userByToken' , tokenToSend , true , 'post' , null).pipe(
+      flatMap((res) => {
+        const userFont = {
+          userId: res[0]._id,
+          font: font
+        };
+        return this.userService.generalApi('font' , userFont , true , 'post' , null)
+      })
+    ).subscribe(
+      (res) =>{}
+    )
   }
  //Hide/Show tasks without youtube url
   filterTasks(){

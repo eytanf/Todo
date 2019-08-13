@@ -46,15 +46,20 @@ router.route('/tasks').get((req,res) => {
     const token = req.header('auth-token');
     Token.find({token: token}).exec()
     .then((result) => {
-        Task.find({$and:[{complete: false},{taskOwnerId: result[0].userId}]})
-        .then(task => {
-            res.status(200).json(task);
-        }).catch(err => {
-            res.status(400).json({msg: err});
-        });
+        if(result.length < 1){
+            res.status(401).json(({msg: err}));
+        }
+        else{
+            Task.find({$and:[{complete: false},{taskOwnerId: result[0].userId}]})
+            .then(task => {
+                res.status(200).json(task);
+            }).catch(err => {
+                res.status(400).json({msg: err});
+            });
+        }
     })
     .catch(err => {
-        res.status(400).json({msg: err});
+        res.status(401).json({msg: err});
     });
 });
 
@@ -63,46 +68,20 @@ router.route('/tasksDone').get((req,res) => {
     const token = req.header('auth-token');
     Token.find({token: token}).exec()
     .then((result) => {
-        Task.find({$and:[{complete: true},{taskOwnerId: result[0].userId}]})
-        .then(task => {
-            res.status(200).json(task);
-        }).catch(err => {
-            res.status(400).json({msg: err});
-        });
+        if(result.length < 1){
+            res.status(401).json(({msg: err}));
+        }
+        else{
+            Task.find({$and:[{complete: true},{taskOwnerId: result[0].userId}]})
+            .then(task => {
+                res.status(200).json(task);
+            }).catch(err => {
+                res.status(400).json({msg: err});
+            });
+        }
     })
     .catch(err => {
-        res.status(400).json({msg: err});
-    });
-});
-
-//Return a task from the database with id given
-router.route('/tasks/:id').get((req , res) => { 
-    //Look for the task in the database if it exist with given id and complete field is false
-    Task.find(
-        {$and:[{id: req.params.id}, {complete: false}]} , (err , task) => {
-        //Return err to console if not found
-        if(err){
-            res.status(400).json({msg: err});
-        }
-        //Return the task as Json
-        else{
-            res.status(200).json(task);
-        }
-    });
-});
-
-//Return a task that is done from the database with id given
-router.route('/tasksDone/:id').get((req , res) => { 
-    //Look for the task in the database if it exist with given id and complete field is true
-    Task.findById({$and:[{id: req.params.id}, {complete: true}]} , (err , task) => {
-        //Return err to console if not found
-        if(err){
-            res.status(400).json({msg: err});
-        }
-        //Return the task as Json
-        else{
-            res.status(200).json(task);
-        }
+        res.status(401).json({msg: err});
     });
 });
 
@@ -112,20 +91,25 @@ router.route('/tasks/add').post((req , res) => {
     const token = req.header('auth-token');
     Token.find({token: token}).exec()
     .then((result) => {
-        const temp = {
-            task: req.body.task,
-            complete: req.body.complete,
-            taskOwnerId: result[0].userId,
-            url: req.body.url,
-            createdTime: req.body.createdTime,
-            updatedTime: req.body.updatedTime
+        if(result.length < 1){
+            res.status(401).json(({msg: err}));
         }
-        let task = new Task(temp);
-        task.save().then(task => {
-            res.status(200).json(task._id);
-        }).catch(err => {
-            res.status(400).json({msg:'Failed to create new record.'});
-        });
+        else{
+            const temp = {
+                task: req.body.task,
+                complete: req.body.complete,
+                taskOwnerId: result[0].userId,
+                url: req.body.url,
+                createdTime: req.body.createdTime,
+                updatedTime: req.body.updatedTime
+            }
+            let task = new Task(temp);
+            task.save().then(task => {
+                res.status(200).json(task._id);
+            }).catch(err => {
+                res.status(400).json({msg:'Failed to create new record.'});
+            });
+        }
     })
     .catch(err => {
         res.status(401).json(({msg: err}));
@@ -135,34 +119,58 @@ router.route('/tasks/add').post((req , res) => {
 
 //Update a task from the tasks database given an id
 router.route('/tasks/update/:id').post((req , res) => { 
+    const token = req.header('auth-token');
+    
+    Token.find({token: token}).exec()
+    .then((result) => {
     //Look for the task in our database
-    var updatedTask = {
-        _id: req.body._id,
-        task: req.body.task,
-        complete: req.body.complete,
-        updatedTime: req.body.updatedTime
-    }
-    Task.updateOne({_id: req.body._id}, {$set: updatedTask} ,(err , task) => {
-        if(err){
-            res.status(400).json({msg: err});
+        if(result.length < 1){
+            res.status(401).json(({msg: err}));
         }
-        //Return the task as Json
         else{
-            res.status(200).json(task);
+            
+            var updatedTask = {
+                _id: req.body._id,
+                task: req.body.task,
+                complete: req.body.complete,
+                updatedTime: req.body.updatedTime
+            }
+            Task.updateOne({_id: req.body._id}, {$set: updatedTask} ,(err , task) => {
+                if(err){
+                    res.status(400).json({msg: err});
+                }
+                //Return the task as Json
+                else{
+                    res.status(200).json(task);
+                }
+            })
         }
-    })
+    }).catch(err => {
+        res.status(401).json(({msg: err}));
+    });
 });
 
 //Delete a task from tasks database given an id
-router.route('/tasks/delete/:id').get((req , res) => { 
+router.route('/tasks/delete/:id').post((req , res) => { 
     //Look for the task in our database and remove it by id
-    Task.remove({_id: req.params.id} , (err,task) => {
-        if(err){
-            res.status(400).json(({msg: err}));
+    const token = req.header('auth-token');
+    Token.find({token: token}).exec()
+    .then((result) => {
+        if(result.length < 1){
+            res.status(401).json(({msg: err}));
         }
         else{
-            res.status(200).json({msg: 'Remove successfuly'});
+            Task.remove({_id: req.params.id} , (err,task) => {
+                if(err){
+                    res.status(400).json(({msg: err}));
+                }
+                else{
+                    res.status(200).json({msg: 'Remove successfuly'});
+                }
+            });
         }
+    }).catch(err => {
+        res.status(401).json(({msg: err}));
     });
 });
 
@@ -229,7 +237,8 @@ router.post("/signin" , (req,res) => {
                     res.status(401).json({msg: 'Auth failed'});
                 }
                 else if(result){
-                    const token = jwt.sign(user[0].email , 'server');
+                    //const token = jwt.sign(user[0].email , 'server');
+                    const token = req.session.id;
                     res.header('auth-token',token);
                     res.status(200).json({
                         email: req.body.email,
@@ -248,56 +257,75 @@ router.post("/signin" , (req,res) => {
     });
 });
 
+//Register a token on login session 
 router.post("/token" , (req , res) => {
-    Token.find({token : req.body.token}).exec()
+    
+    let tokenToStore = new Token(req.body)
+    tokenToStore
+    .save()
+    .then(result => {
+        res.status(200).json({msg: result})
+    })
+    .catch( err => {
+        console.log(err)
+        res.status(400).json(({msg: err}));
+    });    
+})
+
+//Update the color field of a user
+router.post("/color" , (req , res) => {
+    const token = req.header('auth-token');
+    Token.find({token: token}).exec()
     .then((result) => {
         if(result.length < 1){
-            let tokenToStore = new Token(req.body)
-            tokenToStore
-            .save()
-            .then(result => {
-                res.status(200).json({msg: result})
-            })
-            .catch( err => {
-                res.status(400).json(({msg: err}));
-        });
+            res.status(401).json(({msg: err}));
         }
-    })
-    .catch(err => {
-        res.status(400).json(({msg: err}));
+        else{
+            User.updateOne({_id: req.body.userId} , {$set: {color:req.body.color}} , (err , user) => {
+                if(err){
+                    res.status(400).json({msg: err});
+                }
+                //Return the task as Json
+                else{
+                    res.status(200).json({msg: user});
+                }
+            } )
+        }
+    }).catch(err => {
+        res.status(401).json(({msg: err}));
     });
-    
-})
+});
 
-router.post("/color" , (req , res) => {
-    User.updateOne({_id: req.body.userId} , {$set: {color:req.body.color}} , (err , user) => {
-        if(err){
-            res.status(401).json({msg: err});
-        }
-        //Return the task as Json
-        else{
-            res.status(200).json({msg: user});
-        }
-    } )
-})
-
+//Update the font field of a user
 router.post("/font" , (req , res) => {
-    User.updateOne({_id: req.body.userId} , {$set: {font:req.body.font}} , (err , user) => {
-        if(err){
-            res.status(401).json({msg: err});
+    const token = req.header('auth-token');
+    Token.find({token: token}).exec()
+    .then((result) => {
+        if(result.length < 1){
+            res.status(401).json(({msg: err}));
         }
-        //Return the task as Json
         else{
-            res.status(200).json({msg: user});
+            User.updateOne({_id: req.body.userId} , {$set: {font:req.body.font}} , (err , user) => {
+                if(err){
+                    res.status(400).json({msg: err});
+                }
+                //Return the task as Json
+                else{
+                    res.status(200).json({msg: user});
+                }
+            } )
         }
-    } )
+    }).catch(err => {
+        res.status(401).json(({msg: err}));
+    });
 })
 
+//Return a user given a token/cookie
 router.post("/userByToken" , (req , res) => {
     Token.find({token : req.body.token}).exec()
     .then((result) => {
         if(result.length < 1){
-            res.status(400).json({msg: "token dosn't exist"})
+            res.status(401).json({msg: "token dosn't exist"})
         }
         else{
             User.find({_id: result[0].userId}).exec()
@@ -308,27 +336,8 @@ router.post("/userByToken" , (req , res) => {
             })
         }
     }).catch(err => {
-        res.status(400).json({msg: err})
+        res.status(401).json({msg: err})
     })
 })
 
-
-
-// function verify(req , res , next){
-//     try{
-//         const token = req.header('auth-token');
-//         if(!token){
-//             res.status(400).json({msg: 'no token'});;
-//         }
-//         else{
-//             const decoded = jwt.verify(token, 'server');
-//             req.useData = decoded;
-//             next();
-//         }
-//     }catch(error){
-//         return res.status(401).json({
-//             msg: 'Ivalid token'
-//         });
-//     }
-// }
 

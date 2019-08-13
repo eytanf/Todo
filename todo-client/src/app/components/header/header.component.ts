@@ -64,8 +64,16 @@ export class HeaderComponent implements OnInit {
   login(email , password){
     this.isClicked = true;
     this.isUserValid = true; 
-    this.userService.login(email , password).subscribe((res: any) => {
-      this.userService.registerToken(res.token , res._id);
+    const userToValid = {
+      email: email,
+      password: password
+    }
+    this.userService.generalApi('signin',userToValid , false , 'post' , null).subscribe((res: any) => {
+      const tokenToStore = {
+        token: res.token,
+        userId: res._id
+      }
+      this.userService.generalApi('token' , tokenToStore , false , 'post' , null).subscribe();
       this.cookieService.set("token",res.token);
       this.userName = res.email;
       this.userColor = res.color;
@@ -128,7 +136,12 @@ export class HeaderComponent implements OnInit {
   register(email , password , checkPassword){
     this.isClicked = true;
     if(password.length > 0 && password === checkPassword && this.validateEmailReg()){
-      this.userService.addUser(email , password , this.userColor).subscribe(() => {
+      const userToAdd = {
+        email: email,
+        password: password,
+        color: this.userColor
+      }
+      this.userService.generalApi('signup' , userToAdd , false , 'post' , null).subscribe(() => {
         this.login(email , password);
       },(error) => {
         if(error.status == 409){
